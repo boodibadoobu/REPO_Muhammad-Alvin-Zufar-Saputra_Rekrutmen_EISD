@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Ilustrasi lingkungan permukiman</title>
+  <desc id="desc">Ilustrasi abstrak jalan, rumah, pepohonan, dan tanda lokasi.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9efe5"/><stop offset="1" stop-color="#f6e7c8"/></linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <circle cx="955" cy="155" r="78" fill="#e8b84e" opacity=".8"/>
+  <path d="M0 520L185 395l140 88 155-145 198 154 180-130 342 170v268H0z" fill="#7fad94"/>
+  <path d="M0 570L220 460l160 82 170-138 168 133 183-105 299 150v218H0z" fill="#447a60"/>
+  <path d="M310 800c62-184 188-292 378-324 71-12 155-10 252 6-144 75-246 181-304 318z" fill="#d9d5c8"/>
+  <path d="M442 800c56-150 163-245 321-286" fill="none" stroke="#f7f2dd" stroke-width="18" stroke-dasharray="42 28"/>
+  <g fill="#f6f1e4" stroke="#174e3b" stroke-width="12"><path d="M118 530v-132l105-70 107 70v132z"/><path d="M792 485V344l112-75 112 75v141z"/></g>
+  <g fill="#e8b84e"><rect x="194" y="435" width="55" height="95"/><rect x="878" y="390" width="58" height="95"/></g>
+  <g transform="translate(610 255)"><path d="M0 0c-65 0-116 51-116 116 0 88 116 196 116 196s116-108 116-196C116 51 65 0 0 0z" fill="#167554"/><circle cy="112" r="47" fill="#fff"/><path d="M-10 78h20v68h-20zm0 85h20v20h-20z" fill="#167554"/></g>
+</svg>

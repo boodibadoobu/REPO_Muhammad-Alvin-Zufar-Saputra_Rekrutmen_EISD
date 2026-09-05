@@ -1,0 +1,165 @@
+/* Shared Leaflet theme for public maps, details, and the location picker. */
+.location-map.leaflet-container {
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--green-50);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+/* Soften raster tiles only; pins, controls, and attribution stay crisp. */
+.location-map .leaflet-tile-pane {
+    filter: saturate(.45) contrast(.96);
+}
+
+.location-map .leaflet-control-zoom {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgb(13 59 46 / 10%);
+}
+
+.location-map .leaflet-control-zoom a {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    color: var(--green-900);
+    background: var(--white);
+    border-color: var(--border);
+    font-family: inherit;
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.location-map .leaflet-control-zoom a:hover,
+.location-map .leaflet-control-zoom a:focus-visible {
+    color: var(--green-700);
+    background: var(--green-50);
+}
+
+.location-map .leaflet-control-zoom a.leaflet-disabled {
+    color: var(--muted);
+    background: #f3f6f4;
+    cursor: default;
+}
+
+.location-map .leaflet-control-attribution {
+    max-width: 100%;
+    padding: 3px 8px;
+    border-radius: 8px 0 0;
+    color: var(--muted);
+    background: rgb(255 255 255 / 94%);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.location-map .leaflet-control-attribution a {
+    color: var(--green-900);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.location-map .location-pin-wrapper {
+    display: grid;
+    place-items: start center;
+    padding-top: 5px;
+    border: 0;
+    background: transparent;
+}
+
+.location-map .location-pin {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border: 3px solid white;
+    border-radius: 50% 50% 50% 6px;
+    background: var(--green-700);
+    box-shadow: 0 3px 9px rgb(13 59 46 / 24%);
+    transform: rotate(-45deg);
+}
+
+.location-map .location-pin::after {
+    position: absolute;
+    inset: 7px;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border-radius: 50%;
+    background: white;
+}
+
+.location-map .leaflet-popup-content-wrapper {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--ink);
+    background: var(--white);
+    box-shadow: 0 6px 22px rgb(13 59 46 / 12%);
+}
+
+.location-map .leaflet-popup-content {
+    max-width: min(240px, calc(100vw - 130px));
+    margin: 18px 30px 18px 18px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.location-map .map-popup {
+    min-width: 0;
+    gap: 8px;
+    overflow-wrap: anywhere;
+}
+
+.location-map .map-popup strong {
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.location-map .map-popup small {
+    justify-self: start;
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: var(--green-900);
+    background: var(--green-50);
+    font-size: 11px;
+}
+
+.location-map .map-popup a {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    margin-top: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 7px;
+    color: var(--green-700);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.location-map .leaflet-popup-tip {
+    background: var(--white);
+    box-shadow: none;
+}
+
+.location-map a.leaflet-popup-close-button {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 0 14px 0 8px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 20px;
+}
+
+.location-map a.leaflet-popup-close-button:hover {
+    color: var(--green-900);
+    background: var(--green-50);
+}
+
+.location-map a:focus-visible,
+.location-map .location-pin-wrapper:focus-visible {
+    outline: 2px solid var(--green-700);
+    outline-offset: -2px;
+}

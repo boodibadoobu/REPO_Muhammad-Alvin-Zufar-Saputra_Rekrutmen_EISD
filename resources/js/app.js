@@ -1,16 +1,19 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../css/map.css';
 
 const tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const indonesiaCenter = [-2.5, 118];
 const pinIcon = L.divIcon({
     className: 'location-pin-wrapper',
     html: '<span class="location-pin" aria-hidden="true"></span>',
-    iconAnchor: [18, 38],
-    iconSize: [36, 40],
+    iconAnchor: [20, 39],
+    popupAnchor: [0, -32],
+    iconSize: [40, 40],
 });
 
 function addTiles(map) {
+    map.zoomControl.setPosition('bottomleft');
     L.tileLayer(tileLayerUrl, {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
         maxZoom: 19,

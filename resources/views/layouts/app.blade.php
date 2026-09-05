@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="LaporKita membantu warga melaporkan permukiman kumuh dan infrastruktur rusak.">
+    <meta name="description" content="Laporkan kondisi permukiman dan infrastruktur rusak yang mengganggu keselamatan serta akses warga. Pantau progres dan bukti penyelesaiannya di LaporKita.">
     <title>@yield('title', 'LaporKita') · Kota Lebih Layak</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -109,7 +109,7 @@
                     <span class="brand-mark" aria-hidden="true">L</span>
                     <span>Lapor<span>Kita</span></span>
                 </a>
-                <p>Suara warga untuk lingkungan yang lebih aman, sehat, dan layak huni.</p>
+                <p>Suara warga untuk lingkungan yang aman, mudah diakses, dan layak huni.</p>
             </div>
             <div>
                 <strong>Selaras dengan SDG 11</strong>

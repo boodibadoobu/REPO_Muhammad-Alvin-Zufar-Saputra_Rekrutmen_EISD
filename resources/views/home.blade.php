@@ -8,10 +8,14 @@
             <div class="hero-copy">
                 <span class="eyebrow">Warga bergerak · Kota berbenah</span>
                 <h1>Lingkungan layak dimulai dari <em>satu laporan.</em></h1>
-                <p>Laporkan jalan rusak, drainase bermasalah, sanitasi buruk, dan kondisi permukiman yang membutuhkan perhatian. Pantau prosesnya secara transparan sampai selesai.</p>
+                <p>Laporkan kondisi permukiman dan infrastruktur rusak yang mengganggu keselamatan, akses, dan kelayakan lingkungan. Sertakan foto serta lokasi, lalu pantau penanganan dan bukti penyelesaiannya.</p>
                 <div class="hero-actions">
                     @auth
-                        <a href="{{ route('reports.create') }}" class="button button-primary button-large">Buat laporan</a>
+                        @can('create', \App\Models\Report::class)
+                            <a href="{{ route('reports.create') }}" class="button button-primary button-large">Buat laporan</a>
+                        @else
+                            <a href="{{ route('reports.index') }}" class="button button-primary button-large">Tinjau laporan</a>
+                        @endcan
                         <a href="{{ route('dashboard') }}" class="button button-light button-large">Buka dashboard</a>
                     @else
                         <a href="{{ route('register') }}" class="button button-primary button-large">Mulai melapor</a>
@@ -46,8 +50,8 @@
     <section class="stats-strip">
         <div class="container stats-grid">
             <div><strong>{{ number_format($totalReports) }}</strong><span>Laporan warga</span></div>
-            <div><strong>{{ number_format($resolvedReports) }}</strong><span>Masalah selesai</span></div>
-            <div><strong>5</strong><span>Tahap transparan</span></div>
+            <div><strong>{{ number_format($resolvedReports) }}</strong><span>Laporan selesai</span></div>
+            <div><strong>5</strong><span>Status laporan</span></div>
             <div><strong>SDG 11</strong><span>Kota berkelanjutan</span></div>
         </div>
     </section>
@@ -57,7 +61,7 @@
             <div class="section-heading">
                 <span class="eyebrow">Alur yang jelas</span>
                 <h2>Dari laporan menuju perubahan nyata</h2>
-                <p>Setiap laporan melewati tahapan yang dapat dipantau oleh warga.</p>
+                <p>Warga memantau laporannya sejak pengajuan. Setelah diverifikasi, progres dan bukti penyelesaian juga dapat dilihat publik.</p>
             </div>
             <div class="steps-grid">
                 <article class="step-card"><span>01</span><div class="step-icon">↗</div><h3>Kirim laporan</h3><p>Isi lokasi, uraian, kategori masalah, dan unggah foto bukti.</p></article>
@@ -70,7 +74,7 @@
     <section class="section section-soft">
         <div class="container">
             <div class="section-heading heading-row">
-                <div><span class="eyebrow">Dampak bersama</span><h2>Laporan yang sedang ditangani</h2></div>
+                <div><span class="eyebrow">Dampak bersama</span><h2>Perkembangan laporan warga</h2></div>
                 <a href="{{ route('public-reports.index') }}" class="text-link">Lihat semua laporan publik →</a>
             </div>
             <div class="report-preview-grid">
@@ -94,7 +98,7 @@
 
     <section class="cta-section">
         <div class="container cta-card">
-            <div><span class="eyebrow eyebrow-light">Jangan biarkan masalah berlalu</span><h2>Suaramu bisa mengubah lingkungan.</h2><p>Sampaikan kondisi yang kamu temui dan bantu petugas menentukan prioritas penanganan.</p></div>
+            <div><span class="eyebrow eyebrow-light">Jangan biarkan masalah berlalu</span><h2>Suaramu bisa mengubah lingkungan.</h2><p>Ceritakan kondisi dan dampaknya bagi pengguna fasilitas agar petugas dapat meninjau kebutuhan penanganan.</p></div>
             <a href="{{ auth()->check() ? (auth()->user()->hasRole(\App\Enums\UserRole::Warga) ? route('reports.create') : route('dashboard')) : route('register') }}" class="button button-light button-large">{{ auth()->check() && ! auth()->user()->hasRole(\App\Enums\UserRole::Warga) ? 'Buka dashboard →' : 'Laporkan sekarang →' }}</a>
         </div>
     </section>

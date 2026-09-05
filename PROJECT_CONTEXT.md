@@ -16,6 +16,27 @@ verify and process reports, and administrators can manage master data and users.
 Verified reports are also published through a privacy-aware public dashboard so
 the community can follow handling progress and see proof when a ticket is closed.
 
+The product emphasizes how settlement conditions and damaged infrastructure
+affect safety, accessibility, and a livable environment. Residents describe the
+condition, its impact on facility users, and its location; officers review and
+handle the case. This sharpens the existing theme without restricting the product
+to campuses or introducing an automated severity score.
+
+## Submission scope — 8 September 2026
+
+- Keep the existing roles, categories, report workflow, and database structure.
+- Explain safety/accessibility impact through the existing description field;
+  do not require personal information about affected residents.
+- Public maps show up to 200 newest matching reports, not a severity ranking.
+  Public status totals cover all public reports, independently of list filters.
+- Demonstrate reporting, verification, handling, and documented completion.
+  Resolution photos document the officer's reported result; they are not an
+  independent technical inspection or resident confirmation.
+- Heatmaps, planning analytics, SLA/severity scoring, budgeting, and vendor work
+  orders are future possibilities, not requirements for this submission.
+- Prioritize browser QA, the README verification gate, and a reproducible handoff.
+  Hosting and persistent upload storage must be verified before public deployment.
+
 ## Fixed Technical Constraints
 
 1. Laravel only for the application framework, following Route -> Controller ->

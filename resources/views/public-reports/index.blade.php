@@ -15,7 +15,7 @@
                     <a href="{{ route('public-reports.index', ['status' => $status->value]) }}">
                         <span class="badge {{ $status->badgeClass() }}">{{ $status->label() }}</span>
                         <strong>{{ number_format($counts[$status->value]) }}</strong>
-                        <small>laporan</small>
+                        <small>total laporan · semua kategori</small>
                     </a>
                 @endforeach
             </div>
@@ -26,7 +26,7 @@
         <div class="container">
             @if($mapReports->isNotEmpty())
                 <article class="panel public-map-panel">
-                    <div class="panel-heading"><div><h2>Peta laporan terverifikasi</h2><p>Menampilkan maksimal 200 titik yang sesuai dengan filter aktif.</p></div><span class="map-legend"><i></i> Titik laporan</span></div>
+                    <div class="panel-heading"><div><h2>Peta laporan terverifikasi</h2><p>Menampilkan maksimal 200 laporan terbaru yang sesuai filter aktif, bukan peringkat tingkat bahaya.</p></div><span class="map-legend"><i></i> Titik laporan</span></div>
                     <div class="location-map public-report-map" data-public-map aria-label="Peta laporan publik"></div>
                     <script type="application/json" data-map-markers>@json($mapReports)</script>
                 </article>
@@ -35,7 +35,7 @@
             <div class="section-heading public-list-heading">
                 <span class="eyebrow">Data terbuka</span>
                 <h2>Daftar laporan</h2>
-                <p>Hanya laporan berstatus diverifikasi, diproses, atau selesai yang ditampilkan.</p>
+                <p>Hanya laporan berstatus diverifikasi, diproses, atau selesai yang ditampilkan. Filter berlaku untuk daftar dan peta; ringkasan jumlah di atas tetap mencakup seluruh laporan publik.</p>
             </div>
 
             <form method="GET" action="{{ route('public-reports.index') }}" class="filter-bar">

@@ -15,7 +15,7 @@
     <label class="field">
         <span>Deskripsi kondisi</span>
         <textarea name="description" rows="6" required maxlength="3000" placeholder="Jelaskan kondisi, dampak bagi warga, dan sejak kapan masalah terjadi...">{{ old('description', $report->description ?? '') }}</textarea>
-        <small>Minimal 20 karakter. Jangan mencantumkan data pribadi orang lain.</small>
+        <small>Jelaskan sejak kapan kondisi terjadi dan dampaknya bagi pengguna fasilitas. Contoh: lubang membuat pejalan kaki harus turun ke jalan. Minimal 20 karakter; hindari nama atau data pribadi orang lain.</small>
         @error('description')<small class="field-error">{{ $message }}</small>@enderror
     </label>
 

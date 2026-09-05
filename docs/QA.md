@@ -1,9 +1,76 @@
-# QA LaporKita — 5 September 2026
+# QA LaporKita
+
+## Verifikasi terbaru — 6 September 2026 (WIB)
+
+Scope: penajaman narasi keselamatan/aksesibilitas, panduan deskripsi, kejelasan
+statistik dan peta, serta tombol beranda sesuai policy pembuatan laporan.
+Tidak ada perubahan skema, kategori, atau workflow bisnis.
+
+### Lingkungan dan isolasi
+
+- Automated test: SQLite `:memory:` sesuai `phpunit.xml`; 41 tests dan
+  318 assertions lulus. Test baru memeriksa tautan beranda untuk tamu, warga,
+  petugas, dan admin, beserta penolakan endpoint pembuatan bagi petugas/admin.
+- Browser QA: Chrome DevTools pada `http://127.0.0.1:8016`, memakai runtime
+  sementara di `storage/app/qa-focus-20260906` yang diabaikan Git. Runtime tidak
+  membaca `.env` utama; koneksi yang tersedia hanya SQLite QA. Database,
+  upload, cache/sesi database, dan compiled view terpisah dari aplikasi utama.
+- Database QA baru diberi sembilan laporan demo dengan seeder yang ada, kemudian
+  satu laporan `[QA 6 Sep]` dibuat melalui browser dan diselesaikan (#10).
+  Tidak ada reset, seeding, atau penulisan data QA ke Supabase.
+- Semua gambar dan kejadian QA bersifat sintetis. Pemilihan titik melalui klik
+  peta menguji penyimpanan koordinat, bukan ketepatan lokasi kejadian nyata.
+
+### Hasil pemeriksaan
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Beranda dan hak akses | Tamu mendapat tautan registrasi; petugas/admin mendapat Tinjau laporan; endpoint create petugas/admin 403; admin users 200 untuk admin dan 403 untuk petugas |
+| Warga lain | Detail internal laporan #10 mengembalikan 403 untuk warga kedua |
+| Pengajuan dan CAPTCHA | Jawaban salah menampilkan error serta mempertahankan teks/kategori/koordinat; jawaban benar membuat laporan dengan dua kategori dan foto |
+| Privasi sebelum verifikasi | Detail publik laporan diajukan mengembalikan 404; setelah diverifikasi mengembalikan 200 |
+| Penggantian foto | File JPEG pengganti diterima; PNG 8,4 megapiksel ditolak dengan error pemrosesan |
+| Penyelesaian | Transisi diajukan → diverifikasi → diproses → selesai berhasil; browser menolak bukti kosong; PNG 8,4 megapiksel ditolak server dan status tetap diproses tanpa bukti |
+| Sanitasi tiga jalur | JPEG sintetis berorientasi EXIF 6 dan tag Make diproses pada create, replacement, dan resolution; hasil 120×240 dari input 240×120 tanpa Exif/tag PRIVATE-GPS |
+| Detail publik selesai | Foto laporan dan bukti penyelesaian termuat; nama/email akun warga tidak muncul pada halaman |
+| Filter | Pencarian + status selesai + kategori Jalan Rusak menghasilkan satu kartu dan satu marker; total status tetap 3/0/4, sesuai cakupan global yang dijelaskan |
+| Reset dan hasil kosong | Reset kembali ke tujuh laporan publik; pencarian tanpa hasil menampilkan pesan kosong tanpa panel peta |
+| Peta | Popup marker menampilkan judul, status, dan tautan detail; tile OpenStreetMap termuat |
+| Responsivitas | Tidak ada overflow horizontal pada beranda 1440/375 px, daftar publik 375/768 px, detail publik 768 px, dan form 375 px yang diperiksa |
+| Console/network | Detail publik yang diperiksa tidak memiliki console warning/error; dokumen, aset, dua foto, serta tile menerima HTTP 200 |
+
+### Gate README
+
+- `php artisan test`: 41 tests, 318 assertions, lulus.
+- `npm run build`: berhasil; ada informasi timing plugin Vite, bukan kegagalan.
+- `vendor/bin/pint --test`: lulus.
+- `composer validate`: valid; `composer audit`: tidak ada advisory.
+- `php artisan route:list`: 29 route; `php artisan view:cache`: berhasil.
+- `git diff --check`: lulus.
+
+### Batas dan tindak lanjut
+
+- Tool upload file menolak path lokal karena batas workspace tool. Gambar uji
+  kemudian dibuat di browser dan dimasukkan sebagai `File` sintetis ke input;
+  pengiriman memakai form aplikasi. Pemilih file OS belum terverifikasi ulang.
+- Interaksi select native pada emulasi mobile mengalami timeout tool. Filter
+  gabungan diverifikasi dengan mengisi select melalui DOM dan mengirim form;
+  pencarian, tombol Terapkan/Reset, serta popup juga dioperasikan melalui UI.
+- EXIF GPS, metadata PNG/WebP, dan pelestarian foto/status saat penolakan tetap
+  dicakup automated test; browser QA bukan audit aksesibilitas menyeluruh atau
+  pengujian GPS perangkat nyata. Viewport mobile/tablet adalah emulasi.
+- Riwayat QA di bawah dipertahankan sebagai hasil sesi terdahulu. Catatan lama
+  tentang koneksi Supabase bukan status terkini; verifikasi koneksi/seeder
+  terdahulu tercatat di [SUPABASE_SEED.md](SUPABASE_SEED.md), tidak diulang di sesi ini.
+- Tidak ada remote Git terkonfigurasi saat diperiksa; push belum dilakukan.
+  Hosting, URL publik, dan storage deployment belum diputuskan/diverifikasi.
+
+## Riwayat QA — 5 September 2026
 
 Target: aplikasi lokal pada http://127.0.0.1:8000, diperiksa dengan Chrome DevTools.
 Viewport: desktop 1440 px, tablet 768 px, dan mobile/touch 375 px.
 
-## Hasil alur utama
+### Hasil alur utama
 
 | Pemeriksaan | Hasil |
 |---|---|
@@ -25,7 +92,7 @@ nyata. Data lama tidak dihapus, database tidak direset, dan seeder tidak dijalan
 ulang pada database lokal. Pengujian seeder memakai SQLite in-memory dan storage
 palsu yang terisolasi.
 
-## Temuan yang diperbaiki
+### Temuan yang diperbaiki
 
 - Filter melebar keluar layar tablet ketika tombol Reset hadir.
 - Menu untuk pengunjung publik belum tersedia di header mobile.
@@ -38,7 +105,7 @@ palsu yang terisolasi.
   Kandidat kini dipindai sampai maksimal tiga kecocokan jarak ditemukan; batas
   latitude memakai radius bumi yang sama dengan perhitungan jarak.
 
-## Verifikasi akhir
+### Verifikasi akhir
 
 - 35 automated tests, 163 assertions: lulus.
 - Vite production build: berhasil.
@@ -52,7 +119,7 @@ Regresi tambahan mencakup koordinat/bukti seeder, akses laporan ditolak,
 filter publik, kandidat duplikat padat, batas 150 meter, laporan lama/selesai/
 ditolak/kategori berbeda, dan batas lima percobaan pengiriman per menit.
 
-## Audit otomatis aksesibilitas
+### Audit otomatis aksesibilitas
 
 Lighthouse snapshot pada detail publik mobile memberi skor 100 untuk
 Accessibility, Best Practices, SEO, dan Agentic Browsing. Terdapat satu temuan
@@ -61,7 +128,7 @@ terbaca oleh audit sebagai bagian label, sementara markup memang menandainya
 aria-hidden dan nama tautan adalah “LaporKita beranda”. Skor otomatis ini tidak
 menggantikan pengujian pembaca layar atau audit aksesibilitas menyeluruh.
 
-## Batas verifikasi
+### Batas verifikasi
 
 GPS perangkat nyata belum terverifikasi karena browser QA menolak izin lokasi;
 koordinat sukses memakai simulasi callback. Pemeriksaan visual menggunakan

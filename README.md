@@ -5,6 +5,19 @@ kumuh, jalan rusak, drainase, sanitasi, sampah, penerangan, dan infrastruktur
 publik lain yang membutuhkan penanganan. Proyek ini dibuat untuk Rekrutmen Aslab
 EISD dan mendukung **SDG 11: Sustainable Cities and Communities**.
 
+Fokus LaporKita adalah dampak kondisi tersebut terhadap keselamatan,
+aksesibilitas, dan kelayakan lingkungan. Contohnya, jalan berlubang membahayakan
+pengguna, genangan menghambat akses warga, atau penerangan rusak menyulitkan
+penggunaan fasilitas pada malam hari. Warga melaporkan kondisi dengan foto dan
+lokasi; petugas menindaklanjuti; publik memantau progres dan dokumentasi hasilnya.
+
+Kontribusi ini berkaitan dengan target 11.1 (permukiman dan layanan dasar),
+11.7 (ruang publik yang aman dan aksesibel), serta 11.2 untuk laporan terkait
+keselamatan jalan dan akses transportasi. Laporan warga juga dapat menjadi bahan
+evaluasi pemeliharaan yang relevan dengan partisipasi pada target 11.3. Jumlah
+laporan dan status selesai bukan pengukuran indikator resmi SDG atau bukti
+independen kualitas perbaikan. Referensi: [target SDG 11 PBB](https://sdgs.un.org/goals/goal11).
+
 Nama repository yang ditetapkan:
 `REPO_Muhammad Alvin Zufar Saputra_Rekrutmen_EISD`.
 
@@ -32,6 +45,13 @@ Nama repository yang ditetapkan:
   penyelesaian.
 - Relasi One-to-Many dan Many-to-Many melalui pivot `category_report`.
 - Dashboard responsif untuk setiap role.
+
+Peta publik menampilkan maksimal 200 laporan terbaru yang sesuai filter, tanpa
+mengurutkan tingkat bahaya. Ringkasan jumlah per status mencakup seluruh laporan
+publik dan tidak mengikuti filter daftar. Heatmap, analitik perencanaan, SLA,
+anggaran, serta vendor/work order merupakan arah pengembangan, bukan fitur rilis
+rekrutmen ini. Kampus dapat menjadi contoh penerapan tanpa membatasi cakupan
+permukiman dan infrastruktur lingkungan.
 
 ## Teknologi
 
@@ -148,6 +168,28 @@ git diff --check
 
 Hasil QA browser, batas verifikasi, dan checklist demo tersedia di
 [docs/QA.md](docs/QA.md).
+
+## Skenario demonstrasi
+
+Gunakan kasus ilustratif jalan lingkungan berlubang yang mengganggu akses warga.
+Untuk latihan yang membuat atau mengubah laporan, gunakan lingkungan QA lokal
+terisolasi; jangan menjalankan reset database atau seeding destruktif di Supabase.
+
+1. Buka beranda dan laporan publik tanpa login; tunjukkan lokasi, filter, dan
+   batas cakupan peta.
+2. Masuk sebagai warga. Isi kondisi, dampak bagi pengguna fasilitas, foto fixture,
+   kategori, titik peta, dan CAPTCHA. Data fixture harus dinyatakan sebagai demo.
+3. Masuk sebagai petugas dan verifikasi laporan; periksa bahwa laporan kini
+   terlihat publik, sementara identitas akun warga tidak ditampilkan.
+4. Ubah status menjadi diproses. Coba menyelesaikan tanpa foto, lalu unggah foto
+   bukti penyelesaian yang juga berlabel demo.
+5. Buka detail publik untuk menunjukkan progres dan dokumentasi hasil. Foto
+   selesai merupakan bukti yang diunggah petugas, bukan konfirmasi warga.
+6. Periksa bahwa warga lain tidak dapat membuka detail internal laporan tersebut,
+   petugas tidak dapat mengelola pengguna, dan admin dapat mengakses pengelolaan.
+
+Pemeriksaan metadata foto dilakukan melalui automated test/pemeriksaan file;
+browser QA memeriksa tampilan, validasi, dan pengalaman ketiga jalur unggahan.
 
 ## Struktur bisnis
 

@@ -3,6 +3,13 @@
 Dokumen ini adalah sumber UML yang harus tetap sinkron dengan migration dan kode
 Laravel. Diagram menggunakan Mermaid dan dirender otomatis oleh GitHub.
 
+Penajaman fokus keselamatan, aksesibilitas, dan kelayakan lingkungan pada
+6 September 2026 memakai deskripsi serta workflow yang sudah ada. Tidak ada
+perubahan entitas atau transisi status. Tombol beranda mengikuti policy:
+warga dapat membuat laporan, sedangkan petugas/admin diarahkan meninjau laporan.
+Heatmap, analitik perencanaan, dan vendor/work order tidak termasuk implementasi
+yang digambarkan dalam dokumen ini.
+
 ## 1. Use Case Diagram
 
 ```mermaid

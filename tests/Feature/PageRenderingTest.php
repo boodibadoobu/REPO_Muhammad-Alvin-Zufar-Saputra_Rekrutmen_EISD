@@ -40,6 +40,31 @@ class PageRenderingTest extends TestCase
         $this->actingAs($warga)->get(route('reports.edit', $report))->assertOk();
     }
 
+    public function test_home_calls_to_action_follow_report_permissions(): void
+    {
+        $createLink = 'href="'.route('reports.create').'"';
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('href="'.route('register').'"', false)
+            ->assertDontSee($createLink, false);
+
+        $this->actingAs(User::factory()->warga()->create())
+            ->get(route('home'))
+            ->assertOk()
+            ->assertSee($createLink, false);
+
+        foreach ([User::factory()->petugas()->create(), User::factory()->admin()->create()] as $officer) {
+            $this->actingAs($officer)->get(route('home'))
+                ->assertOk()
+                ->assertSee('href="'.route('reports.index').'"', false)
+                ->assertSee('Tinjau laporan')
+                ->assertDontSee($createLink, false);
+
+            $this->get(route('reports.create'))->assertForbidden();
+        }
+    }
+
     public function test_petugas_report_page_renders_with_status_action(): void
     {
         $petugas = User::factory()->petugas()->create();

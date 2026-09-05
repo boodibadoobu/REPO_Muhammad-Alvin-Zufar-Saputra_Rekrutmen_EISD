@@ -7,6 +7,7 @@ Laravel. Diagram menggunakan Mermaid dan dirender otomatis oleh GitHub.
 
 ```mermaid
 flowchart LR
+    V([Pengunjung Publik])
     W([Warga])
     P([Petugas])
     A([Admin])
@@ -27,26 +28,37 @@ flowchart LR
         UC13((Menyelesaikan laporan))
         UC14((Mengelola kategori))
         UC15((Mengelola pengguna\ndan role))
+        UC16((Memilih titik lokasi\nGPS atau peta))
+        UC17((Lolos CAPTCHA dan\npemeriksaan duplikat))
+        UC18((Melihat dashboard\nlaporan publik))
+        UC19((Melihat detail, progres,\ndan bukti penyelesaian))
+        UC20((Mengunggah foto\nbukti penyelesaian))
     end
 
+    V --> UC18 & UC19
     W --> UC1 & UC2 & UC3 & UC4 & UC7 & UC8
     UC4 -. include .-> UC5
     UC4 -. include .-> UC6
-    P --> UC2 & UC3 & UC9 & UC10 & UC11 & UC12 & UC13
-    A --> UC2 & UC3 & UC9 & UC10 & UC11 & UC12 & UC13 & UC14 & UC15
+    UC4 -. include .-> UC16
+    UC4 -. include .-> UC17
+    W --> UC18 & UC19
+    P --> UC2 & UC3 & UC9 & UC10 & UC11 & UC12 & UC13 & UC18 & UC19 & UC20
+    A --> UC2 & UC3 & UC9 & UC10 & UC11 & UC12 & UC13 & UC14 & UC15 & UC18 & UC19 & UC20
 ```
 
 ### Matriks hak akses
 
-| Fitur | Warga | Petugas | Admin |
-|---|:---:|:---:|:---:|
-| Registrasi publik | Ya, selalu role warga | Tidak | Tidak |
-| Membuat laporan | Ya | Tidak | Tidak |
-| Melihat laporan | Milik sendiri | Semua | Semua |
-| Edit/hapus laporan | Milik sendiri, hanya `diajukan` | Tidak | Tidak |
-| Ubah status laporan | Tidak | Ya | Ya |
-| Kelola kategori | Tidak | Tidak | Ya |
-| Kelola pengguna/role | Tidak | Tidak | Ya |
+| Fitur | Publik | Warga | Petugas | Admin |
+|---|:---:|:---:|:---:|:---:|
+| Registrasi publik | Ya, menjadi warga | Ya, selalu role warga | Tidak | Tidak |
+| Membuat laporan | Tidak | Ya, dengan peta dan CAPTCHA | Tidak | Tidak |
+| Melihat dashboard publik | Ya | Ya | Ya | Ya |
+| Melihat laporan internal | Tidak | Milik sendiri | Semua | Semua |
+| Edit/hapus laporan | Tidak | Milik sendiri, hanya `diajukan` | Tidak | Tidak |
+| Ubah status laporan | Tidak | Tidak | Ya | Ya |
+| Unggah bukti penyelesaian | Tidak | Tidak | Ya | Ya |
+| Kelola kategori | Tidak | Tidak | Tidak | Ya |
+| Kelola pengguna/role | Tidak | Tidak | Tidak | Ya |
 
 ## 2. Class Diagram
 
@@ -74,7 +86,10 @@ classDiagram
         +varchar title
         +text description
         +varchar address
+        +decimal? latitude
+        +decimal? longitude
         +varchar photo_path
+        +varchar? resolution_photo_path
         +varchar status
         +text? officer_note
         +timestamp? verified_at
@@ -105,7 +120,7 @@ classDiagram
 
     class ReportController {
         +index(request) View
-        +create() View
+        +create(request) View
         +store(request) RedirectResponse
         +show(report) View
         +edit(report) View
@@ -115,6 +130,11 @@ classDiagram
 
     class ReportStatusController {
         +update(request, report, action) RedirectResponse
+    }
+
+    class PublicReportController {
+        +index(request) View
+        +show(report) View
     }
 
     class CategoryController {
@@ -133,7 +153,11 @@ classDiagram
     }
 
     class TransitionReportStatus {
-        +handle(report, nextStatus, officer, note) Report
+        +handle(report, nextStatus, officer, note, resolutionPhotoPath) Report
+    }
+
+    class FindPotentialDuplicateReports {
+        +handle(latitude, longitude, categoryIds) Collection
     }
 
     User "1" --> "0..*" Report : reporter / user_id
@@ -143,6 +167,9 @@ classDiagram
     Report "0..*" -- "0..*" Category : category_report
     ReportController ..> Report : manages
     ReportController ..> Category : reads
+    ReportController ..> FindPotentialDuplicateReports : validates duplicate
+    PublicReportController ..> Report : publishes verified reports
+    PublicReportController ..> Category : filters
     ReportStatusController ..> TransitionReportStatus : invokes
     TransitionReportStatus ..> Report : transitions
     CategoryController ..> Category : manages
@@ -154,7 +181,7 @@ classDiagram
 | Tabel | Kolom migration | Constraint/index |
 |---|---|---|
 | `users` | `id`, `name`, `email`, `email_verified_at`, `password`, `role`, `remember_token`, `created_at`, `updated_at` | PK `id`, unique `email`, index `role` |
-| `reports` | `id`, `user_id`, `officer_id`, `title`, `description`, `address`, `photo_path`, `status`, `officer_note`, empat timestamp proses, Laravel timestamps | FK reporter cascade, FK officer null-on-delete, index status dan pasangan user/status |
+| `reports` | `id`, `user_id`, `officer_id`, `title`, `description`, `address`, `latitude`, `longitude`, `photo_path`, `resolution_photo_path`, `status`, `officer_note`, empat timestamp proses, Laravel timestamps | FK reporter cascade, FK officer null-on-delete, index status, pasangan user/status, officer/status, dan latitude/longitude |
 | `categories` | `id`, `name`, `slug`, `description`, Laravel timestamps | PK `id`, unique `name`, unique `slug` |
 | `category_report` | `id`, `category_id`, `report_id`, Laravel timestamps | Dua FK cascade dan unique pasangan kategori/laporan |
 
@@ -167,41 +194,55 @@ domain pada relasi bisnis di atas.
 
 ```mermaid
 flowchart TD
-    A([Warga membuka form laporan]) --> B[Isi judul, deskripsi, alamat]
-    B --> C[Pilih satu atau lebih kategori]
-    C --> D[Unggah foto bukti]
-    D --> E{Validasi server berhasil?}
-    E -- Tidak --> F[Tampilkan pesan kesalahan]
-    F --> B
-    E -- Ya --> G[Simpan laporan berstatus diajukan]
-    G --> H[Simpan relasi kategori pada pivot]
-    H --> I[Tampilkan flash message berhasil]
-    I --> J[Petugas membuka detail laporan]
-    J --> K{Laporan valid?}
-    K -- Tidak --> L[Isi alasan penolakan]
-    L --> M[Status ditolak]
-    M --> Z([Proses berakhir])
-    K -- Ya --> N[Status diverifikasi]
-    N --> O[Petugas mulai penanganan]
-    O --> P[Status diproses]
-    P --> Q{Penanganan selesai?}
-    Q -- Belum --> O
-    Q -- Ya --> R[Status selesai]
-    R --> Z
+    A([Warga membuka form laporan]) --> B[Isi judul, deskripsi, dan alamat]
+    B --> C[Pilih titik melalui GPS, klik peta, atau geser pin]
+    C --> D[Pilih satu atau lebih kategori dan unggah foto]
+    D --> E[Jawab CAPTCHA]
+    E --> F{Validasi server berhasil?}
+    F -- Tidak --> G[Tampilkan pesan kesalahan]
+    G --> B
+    F -- Ya --> H{Ada laporan aktif serupa\ndalam radius 150 meter?}
+    H -- Ya --> I{Warga mengonfirmasi\nbukan duplikat?}
+    I -- Tidak --> J[Tampilkan peringatan dan ID kandidat]
+    J --> B
+    I -- Ya --> K[Simpan laporan berstatus diajukan]
+    H -- Tidak --> K
+    K --> L[Simpan relasi kategori pada pivot]
+    L --> M[Tampilkan flash message berhasil]
+    M --> N[Petugas membuka detail laporan]
+    N --> O{Laporan valid?}
+    O -- Tidak --> P[Isi alasan penolakan]
+    P --> Q[Status ditolak]
+    Q --> Z([Proses berakhir])
+    O -- Ya --> R[Status diverifikasi dan tampil di dashboard publik]
+    R --> S[Petugas mulai penanganan]
+    S --> T[Status diproses]
+    T --> U{Penanganan selesai?}
+    U -- Belum --> S
+    U -- Ya --> V[Unggah foto bukti penyelesaian]
+    V --> W{Foto valid?}
+    W -- Tidak --> X[Tampilkan pesan kesalahan]
+    X --> V
+    W -- Ya --> Y[Status selesai dan tiket ditutup]
+    Y --> Z
 ```
 
-Aturan gagal utama: input tidak valid kembali ke form dengan error; penolakan
-tanpa catatan gagal validasi; lompatan status seperti `diajukan` langsung ke
-`selesai` ditolak oleh `TransitionReportStatus`.
+Aturan gagal utama: input atau CAPTCHA tidak valid kembali ke form dengan error;
+kandidat duplikat perlu konfirmasi eksplisit; penolakan tanpa catatan gagal
+validasi; penyelesaian tanpa foto bukti gagal; lompatan status seperti
+`diajukan` langsung ke `selesai` ditolak oleh request dan
+`TransitionReportStatus`.
 
 ## 4. Sequence Diagram — Membuat dan Memproses Laporan
 
 ```mermaid
 sequenceDiagram
     actor W as Warga
+    participant B as Browser + Leaflet
     participant R as Web Route
     participant RC as ReportController
     participant FR as StoreReportRequest
+    participant DD as FindPotentialDuplicateReports
     participant FS as Public Storage
     participant RM as Report Model
     participant DB as Supabase PostgreSQL
@@ -209,33 +250,51 @@ sequenceDiagram
     participant SC as ReportStatusController
     participant SR as UpdateReportStatusRequest
     participant TS as TransitionReportStatus
+    actor V as Pengunjung Publik
+    participant PC as PublicReportController
 
-    W->>R: POST /reports + data + foto + kategori[]
-    R->>FR: autentikasi, policy, validasi
+    W->>B: Pilih GPS, klik peta, atau geser pin
+    B-->>W: Isi latitude dan longitude
+    W->>R: POST /reports + data + koordinat + foto + kategori[] + CAPTCHA
+    R->>FR: autentikasi, policy, CAPTCHA, validasi
     alt input tidak valid
         FR-->>W: redirect kembali + flash error
     else input valid
+        FR->>DD: cari kategori sama dalam 150 m dan 30 hari
+        alt duplikat potensial tanpa konfirmasi
+            DD-->>W: redirect + ID kandidat + minta konfirmasi
+        else tidak ada atau sudah dikonfirmasi
         FR->>RC: validated request
         RC->>FS: simpan foto bukti
         RC->>RM: buat laporan via relasi user
-        RM->>DB: INSERT reports (status=diajukan)
+        RM->>DB: INSERT reports + koordinat (status=diajukan)
         RC->>DB: INSERT category_report (satu atau lebih)
         DB-->>RC: commit transaksi
         RC-->>W: redirect detail + flash berhasil
+        end
     end
 
-    P->>R: PATCH /reports/{report}/status
-    R->>SR: autentikasi, policy, validasi
-    SR->>SC: validated status dan catatan
-    SC->>TS: handle(report, status, petugas, catatan)
+    P->>R: PATCH /reports/{report}/status + catatan + foto penyelesaian
+    R->>SR: autentikasi, policy, validasi status dan file
+    SR->>SC: validated status, catatan, dan file
+    opt target status selesai
+        SC->>FS: simpan foto bukti penyelesaian
+    end
+    SC->>TS: handle(report, status, petugas, catatan, path bukti)
     TS->>TS: periksa allowedTransitions()
     alt transisi tidak sah
         TS-->>P: validation error + status lama
     else transisi sah
-        TS->>RM: set status, officer_id, timestamp
+        TS->>RM: set status, officer_id, timestamp, bukti
         RM->>DB: UPDATE reports
         DB-->>P: redirect detail + flash berhasil
     end
+
+    V->>R: GET /laporan-publik atau detail
+    R->>PC: filter hanya diverifikasi, diproses, selesai
+    PC->>DB: SELECT laporan, kategori, koordinat, progres, bukti
+    DB-->>PC: data tanpa akun pelapor
+    PC-->>V: peta, daftar, detail, timeline, bukti penyelesaian
 ```
 
 ## 5. State Diagram Status Laporan

@@ -15,7 +15,7 @@
                         <a href="{{ route('dashboard') }}" class="button button-light button-large">Buka dashboard</a>
                     @else
                         <a href="{{ route('register') }}" class="button button-primary button-large">Mulai melapor</a>
-                        <a href="#cara-kerja" class="button button-light button-large">Lihat cara kerja</a>
+                        <a href="{{ route('public-reports.index') }}" class="button button-light button-large">Lihat laporan publik</a>
                     @endauth
                 </div>
                 <div class="trust-row">
@@ -71,7 +71,7 @@
         <div class="container">
             <div class="section-heading heading-row">
                 <div><span class="eyebrow">Dampak bersama</span><h2>Laporan yang sedang ditangani</h2></div>
-                @auth<a href="{{ route('reports.index') }}" class="text-link">Lihat semua laporan →</a>@endauth
+                <a href="{{ route('public-reports.index') }}" class="text-link">Lihat semua laporan publik →</a>
             </div>
             <div class="report-preview-grid">
                 @forelse($recentReports as $report)
@@ -82,6 +82,7 @@
                             <h3>{{ $report->title }}</h3>
                             <p>{{ Str::limit($report->description, 110) }}</p>
                             <div class="tag-row">@foreach($report->categories as $category)<span>{{ $category->name }}</span>@endforeach</div>
+                            <a href="{{ route('public-reports.show', $report) }}" class="text-link preview-link">Lihat perkembangan →</a>
                         </div>
                     </article>
                 @empty

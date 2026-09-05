@@ -18,6 +18,7 @@
 
             <nav class="desktop-nav" aria-label="Navigasi utama">
                 <a href="{{ route('home') }}" @class(['active' => request()->routeIs('home')])>Beranda</a>
+                <a href="{{ route('public-reports.index') }}" @class(['active' => request()->routeIs('public-reports.*')])>Laporan Publik</a>
                 @auth
                     <a href="{{ route('dashboard') }}" @class(['active' => request()->routeIs('dashboard')])>Dashboard</a>
                     <a href="{{ route('reports.index') }}" @class(['active' => request()->routeIs('reports.*')])>Laporan</a>
@@ -31,7 +32,15 @@
             <div class="nav-actions">
                 @guest
                     <a href="{{ route('login') }}" class="button button-ghost">Masuk</a>
-                    <a href="{{ route('register') }}" class="button button-primary">Daftar</a>
+                    <a href="{{ route('register') }}" class="button button-primary nav-register">Daftar</a>
+                    <details class="mobile-menu">
+                        <summary>Menu</summary>
+                        <div>
+                            <a href="{{ route('home') }}">Beranda</a>
+                            <a href="{{ route('public-reports.index') }}">Laporan Publik</a>
+                            <a href="{{ route('register') }}">Daftar sebagai warga</a>
+                        </div>
+                    </details>
                 @else
                     <div class="user-chip">
                         <span class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
@@ -48,6 +57,7 @@
                         <summary>Menu</summary>
                         <div>
                             <a href="{{ route('dashboard') }}">Dashboard</a>
+                            <a href="{{ route('public-reports.index') }}">Laporan Publik</a>
                             <a href="{{ route('reports.index') }}">Laporan</a>
                             @if(auth()->user()->hasRole(\App\Enums\UserRole::Admin))
                                 <a href="{{ route('admin.categories.index') }}">Kategori</a>
@@ -104,6 +114,7 @@
             <div>
                 <strong>Selaras dengan SDG 11</strong>
                 <p>Kota dan permukiman yang inklusif, aman, tangguh, dan berkelanjutan.</p>
+                <a href="{{ route('public-reports.index') }}" class="footer-link">Lihat laporan publik →</a>
             </div>
             <p class="copyright">© {{ date('Y') }} LaporKita · Rekrutmen Aslab EISD</p>
         </div>

@@ -13,6 +13,10 @@ Nama repository yang ditetapkan:
 - Registrasi dan login berbasis session Laravel.
 - Tiga role: `warga`, `petugas`, dan `admin`.
 - Warga dapat membuat laporan dengan foto serta memilih banyak kategori.
+- Lokasi laporan dipilih melalui peta Leaflet: GPS perangkat, klik peta, atau
+  pin yang dapat digeser.
+- CAPTCHA berbasis session, rate limit, dan deteksi laporan aktif serupa dalam
+  radius 150 meter membantu mengurangi spam serta duplikasi.
 - Warga hanya dapat melihat laporannya sendiri dan hanya dapat mengedit atau
   menghapus laporan ketika masih berstatus `diajukan`.
 - Petugas dan admin dapat memproses laporan melalui alur:
@@ -21,6 +25,11 @@ Nama repository yang ditetapkan:
 - Admin dapat mengelola kategori dan role pengguna.
 - Validasi server-side, policy, middleware role, CSRF, rate limit login, flash
   message, dan validasi upload gambar.
+- Dashboard publik menampilkan laporan terverifikasi, diproses, dan selesai
+  beserta peta, detail progres, serta bukti foto penyelesaian tanpa membuka
+  identitas pelapor.
+- Tiket hanya dapat diubah menjadi selesai setelah petugas mengunggah foto bukti
+  penyelesaian.
 - Relasi One-to-Many dan Many-to-Many melalui pivot `category_report`.
 - Dashboard responsif untuk setiap role.
 
@@ -29,7 +38,7 @@ Nama repository yang ditetapkan:
 - PHP 8.3 atau lebih baru
 - Laravel 13
 - PostgreSQL Supabase untuk database aplikasi
-- Blade, Vite, dan Tailwind CSS 4 untuk tampilan
+- Blade, Vite, Tailwind CSS 4, Leaflet 1.9, dan tile OpenStreetMap untuk tampilan
 - PHPUnit dengan SQLite in-memory untuk automated test
 
 Tidak ada package admin atau generator CRUD otomatis seperti Filament.
@@ -82,6 +91,13 @@ php artisan serve
 
 Buka `http://127.0.0.1:8000`.
 
+Dashboard transparansi tersedia tanpa login di
+`http://127.0.0.1:8000/laporan-publik`.
+
+Fitur lokasi perangkat membutuhkan izin geolocation dari browser. Gunakan
+localhost saat pengembangan dan HTTPS saat deployment. Jika GPS ditolak, warga
+tetap dapat memilih lokasi dengan klik atau menggeser pin pada peta.
+
 ## Akun demo
 
 Semua akun hasil seeder menggunakan kata sandi `Password123!`.
@@ -106,12 +122,17 @@ tidak akan menghapus atau mengubah data Supabase.
 Pemeriksaan kualitas yang disarankan:
 
 ```bash
+npm run build
 vendor/bin/pint --test
 composer validate
 composer audit
 php artisan route:list
 php artisan view:cache
+git diff --check
 ```
+
+Hasil QA browser, batas verifikasi, dan checklist demo tersedia di
+[docs/QA.md](docs/QA.md).
 
 ## Struktur bisnis
 
@@ -123,6 +144,11 @@ php artisan view:cache
 - Otorisasi laporan berada di `app/Policies/ReportPolicy.php`.
 - Aturan perpindahan status berada di
   `app/Actions/TransitionReportStatus.php`.
+- Deteksi laporan serupa berada di
+  `app/Actions/FindPotentialDuplicateReports.php`. Kandidat duplikat adalah
+  laporan aktif dengan minimal satu kategori sama, berjarak maksimal 150 meter,
+  dan dibuat dalam 30 hari terakhir. Warga dapat melanjutkan setelah memberi
+  konfirmasi eksplisit agar kondisi yang memang berbeda tidak terblokir.
 
 Dokumentasi Use Case, Class, Activity, Sequence, state diagram, dan kecocokan
 database tersedia di [docs/UML.md](docs/UML.md). Keputusan scope permanen proyek
@@ -132,6 +158,8 @@ tersimpan di [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).
 
 - Gunakan `APP_ENV=production` dan `APP_DEBUG=false`.
 - Gunakan HTTPS serta set `SESSION_SECURE_COOKIE=true`.
+- Pastikan server mengizinkan koneksi keluar ke tile OpenStreetMap dan tampilkan
+  atribusi OpenStreetMap yang sudah disediakan pada peta.
 - Pastikan `storage` dan `bootstrap/cache` dapat ditulis server.
 - Jalankan `php artisan migrate --force`, `php artisan storage:link`, dan
   `php artisan optimize` pada proses deployment.

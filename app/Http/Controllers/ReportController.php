@@ -39,8 +39,8 @@ class ReportController extends Controller
             ->when($request->filled('search'), function (Builder $builder) use ($request): void {
                 $term = '%'.$request->string('search').'%';
                 $builder->where(fn (Builder $search) => $search
-                    ->where('title', 'like', $term)
-                    ->orWhere('address', 'like', $term));
+                    ->whereLike('title', $term)
+                    ->orWhereLike('address', $term));
             });
 
         return view('reports.index', [
@@ -50,12 +50,17 @@ class ReportController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         Gate::authorize('create', Report::class);
 
+        $left = random_int(2, 9);
+        $right = random_int(1, 9);
+        $request->session()->put('report_captcha_answer', $left + $right);
+
         return view('reports.create', [
             'categories' => Category::query()->orderBy('name')->get(),
+            'captchaQuestion' => "{$left} + {$right}",
         ]);
     }
 
@@ -66,7 +71,7 @@ class ReportController extends Controller
         try {
             $report = DB::transaction(function () use ($request, $photoPath): Report {
                 $report = $request->user()->reports()->create([
-                    ...$request->safe()->only(['title', 'description', 'address']),
+                    ...$request->safe()->only(['title', 'description', 'address', 'latitude', 'longitude']),
                     'photo_path' => $photoPath,
                 ]);
                 $report->categories()->attach($request->validated('category_ids'));
@@ -112,7 +117,7 @@ class ReportController extends Controller
 
         try {
             DB::transaction(function () use ($request, $report, $newPhotoPath): void {
-                $report->fill(Arr::only($request->validated(), ['title', 'description', 'address']));
+                $report->fill(Arr::only($request->validated(), ['title', 'description', 'address', 'latitude', 'longitude']));
 
                 if ($newPhotoPath) {
                     $report->photo_path = $newPhotoPath;
@@ -140,8 +145,13 @@ class ReportController extends Controller
     {
         Gate::authorize('delete', $report);
         $photoPath = $report->photo_path;
+        $resolutionPhotoPath = $report->resolution_photo_path;
         $report->delete();
         Storage::disk('public')->delete($photoPath);
+
+        if ($resolutionPhotoPath) {
+            Storage::disk('public')->delete($resolutionPhotoPath);
+        }
 
         return redirect()->route('reports.index')->with('success', 'Laporan berhasil dihapus.');
     }

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['title', 'description', 'address', 'photo_path'])]
+#[Fillable(['title', 'description', 'address', 'latitude', 'longitude', 'photo_path'])]
 class Report extends Model
 {
     /** @use HasFactory<ReportFactory> */
@@ -38,6 +38,8 @@ class Report extends Model
     {
         return [
             'status' => ReportStatus::class,
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
             'verified_at' => 'datetime',
             'processed_at' => 'datetime',
             'resolved_at' => 'datetime',

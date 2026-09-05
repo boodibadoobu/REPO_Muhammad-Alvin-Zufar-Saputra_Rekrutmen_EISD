@@ -23,6 +23,7 @@ class PageRenderingTest extends TestCase
         $this->get(route('home'))->assertOk()->assertSee('LaporKita');
         $this->get(route('login'))->assertOk()->assertSee('Masuk ke LaporKita');
         $this->get(route('register'))->assertOk()->assertSee('Buat akun warga');
+        $this->get(route('public-reports.index'))->assertOk()->assertSee('Laporan Publik');
     }
 
     public function test_warga_pages_render(): void

@@ -11,7 +11,7 @@
             </div>
 
             <form method="GET" action="{{ route('reports.index') }}" class="filter-bar">
-                <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau lokasi..."></label>
+                <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="search" aria-label="Cari judul atau lokasi laporan" value="{{ request('search') }}" placeholder="Cari judul atau lokasi..."></label>
                 <select name="status" aria-label="Filter status"><option value="">Semua status</option>@foreach($statuses as $status)<option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>@endforeach</select>
                 <select name="category" aria-label="Filter kategori"><option value="">Semua kategori</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected((string) request('category') === (string) $category->id)>{{ $category->name }}</option>@endforeach</select>
                 <button type="submit" class="button button-dark">Terapkan</button>

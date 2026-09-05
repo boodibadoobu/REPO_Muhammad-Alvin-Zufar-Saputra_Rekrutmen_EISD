@@ -18,7 +18,10 @@ class ReportFactory extends Factory
             'title' => fake()->sentence(5),
             'description' => fake()->paragraph(),
             'address' => fake()->address(),
+            'latitude' => fake()->latitude(-8.1, -7.8),
+            'longitude' => fake()->longitude(112.5, 112.8),
             'photo_path' => 'reports/contoh.jpg',
+            'resolution_photo_path' => null,
             'status' => ReportStatus::Diajukan,
             'officer_note' => null,
         ];

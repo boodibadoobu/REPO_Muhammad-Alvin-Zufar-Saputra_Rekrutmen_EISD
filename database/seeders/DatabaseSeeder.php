@@ -54,6 +54,8 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Jalan lingkungan berlubang dan tergenang',
                 'description' => 'Kerusakan jalan semakin lebar ketika hujan dan genangan membuat pengendara sulit melihat lubang.',
                 'address' => 'Jalan Melati RT 03 RW 02, Kelurahan Sukamaju',
+                'latitude' => -7.9668200,
+                'longitude' => 112.6329100,
                 'status' => ReportStatus::Diajukan,
                 'category_indexes' => [0, 1],
             ],
@@ -61,6 +63,8 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Saluran drainase tertutup sampah',
                 'description' => 'Sampah menumpuk di saluran utama sehingga air meluap ke halaman rumah warga saat hujan deras.',
                 'address' => 'Gang Anggrek RT 05 RW 01, Kelurahan Sukamaju',
+                'latitude' => -7.9681400,
+                'longitude' => 112.6341800,
                 'status' => ReportStatus::Diverifikasi,
                 'category_indexes' => [1, 3],
             ],
@@ -68,6 +72,8 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Lampu jalan padam di akses permukiman',
                 'description' => 'Tiga titik lampu jalan tidak menyala dan membuat akses menuju permukiman gelap pada malam hari.',
                 'address' => 'Jalan Kenanga RT 02 RW 06, Kelurahan Harapan',
+                'latitude' => -7.9724200,
+                'longitude' => 112.6297500,
                 'status' => ReportStatus::Diproses,
                 'category_indexes' => [4],
             ],
@@ -75,6 +81,8 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Tempat sampah komunal sudah diperbaiki',
                 'description' => 'Tempat penampungan sementara sebelumnya rusak dan sampah tercecer ke badan jalan.',
                 'address' => 'Pasar Warga RW 04, Kelurahan Harapan',
+                'latitude' => -7.9740800,
+                'longitude' => 112.6360200,
                 'status' => ReportStatus::Selesai,
                 'category_indexes' => [3],
             ],
@@ -88,7 +96,12 @@ class DatabaseSeeder extends Seeder
             $report->title = $data['title'];
             $report->description = $data['description'];
             $report->address = $data['address'];
+            $report->latitude = $data['latitude'];
+            $report->longitude = $data['longitude'];
             $report->photo_path = 'reports/contoh-lingkungan.svg';
+            $report->resolution_photo_path = $data['status'] === ReportStatus::Selesai
+                ? 'reports/contoh-lingkungan.svg'
+                : null;
             $report->status = $data['status'];
             $report->officer_note = $data['status'] === ReportStatus::Diajukan ? null : 'Laporan telah diperiksa oleh petugas lapangan.';
             $report->verified_at = in_array($data['status'], [ReportStatus::Diverifikasi, ReportStatus::Diproses, ReportStatus::Selesai], true) ? now()->subDays(3) : null;

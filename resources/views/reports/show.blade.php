@@ -15,6 +15,12 @@
                 <div class="detail-main">
                     <img class="report-photo" src="{{ Storage::url($report->photo_path) }}" alt="Foto bukti {{ $report->title }}">
                     <article class="panel prose-panel"><h2>Deskripsi laporan</h2><p>{{ $report->description }}</p><div class="tag-row">@foreach($report->categories as $category)<span>{{ $category->name }}</span>@endforeach</div></article>
+                    @if($report->latitude && $report->longitude)
+                        <article class="panel map-panel"><div class="panel-heading"><div><h2>Titik lokasi laporan</h2><p>Koordinat {{ $report->latitude }}, {{ $report->longitude }}</p></div></div><div class="location-map location-map-display" data-location-display data-latitude="{{ $report->latitude }}" data-longitude="{{ $report->longitude }}" aria-label="Peta lokasi laporan"></div></article>
+                    @endif
+                    @if($report->resolution_photo_path)
+                        <article class="panel resolution-panel"><div class="panel-heading"><div><span class="eyebrow">Tiket ditutup</span><h2>Bukti penyelesaian</h2><p>Dokumentasi hasil penanganan oleh petugas.</p></div><span class="badge badge-success">Selesai</span></div><img class="resolution-photo" src="{{ Storage::url($report->resolution_photo_path) }}" alt="Foto bukti penyelesaian {{ $report->title }}"></article>
+                    @endif
                     <article class="panel"><div class="panel-heading"><div><h2>Progres penanganan</h2><p>Status diperbarui oleh petugas pada setiap tahap.</p></div></div>
                         <ol class="timeline">
                             <li class="done"><span></span><div><strong>Laporan diajukan</strong><small>{{ $report->created_at->format('d M Y, H:i') }}</small></div></li>
@@ -34,11 +40,14 @@
                             <h2>Tindak lanjut laporan</h2>
                             @if(count($nextStatuses))
                                 <p>Pilih tahap berikutnya sesuai hasil pemeriksaan.</p>
-                                <form method="POST" action="{{ route('reports.status.update', $report) }}" class="form-stack compact-form">
+                                <form method="POST" action="{{ route('reports.status.update', $report) }}" enctype="multipart/form-data" class="form-stack compact-form">
                                     @csrf
                                     @method('PATCH')
                                     <label class="field"><span>Status berikutnya</span><select name="status" required>@foreach($nextStatuses as $status)<option value="{{ $status->value }}">{{ $status->label() }}</option>@endforeach</select></label>
                                     <label class="field"><span>Catatan petugas</span><textarea name="officer_note" rows="4" maxlength="1000" placeholder="Wajib diisi jika laporan ditolak">{{ old('officer_note', $report->officer_note) }}</textarea></label>
+                                    @if(collect($nextStatuses)->contains(\App\Enums\ReportStatus::Selesai))
+                                        <label class="field"><span>Foto bukti penyelesaian</span><span class="upload-box"><b>✓</b><span><strong>Unggah hasil penanganan</strong><small>Wajib untuk menutup tiket · maksimal 2 MB</small></span><input type="file" name="resolution_photo" accept="image/jpeg,image/png,image/webp" required></span></label>
+                                    @endif
                                     <button type="submit" class="button button-primary button-block">Perbarui status</button>
                                 </form>
                             @else

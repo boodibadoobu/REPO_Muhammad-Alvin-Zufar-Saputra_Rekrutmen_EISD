@@ -12,17 +12,32 @@ class TransitionReportStatus
     /**
      * @throws ValidationException
      */
-    public function handle(Report $report, ReportStatus $nextStatus, User $officer, ?string $note): Report
-    {
+    public function handle(
+        Report $report,
+        ReportStatus $nextStatus,
+        User $officer,
+        ?string $note,
+        ?string $resolutionPhotoPath = null,
+    ): Report {
         if (! $report->status->canTransitionTo($nextStatus)) {
             throw ValidationException::withMessages([
                 'status' => "Status {$report->status->label()} tidak dapat langsung diubah menjadi {$nextStatus->label()}.",
             ]);
         }
 
+        if ($nextStatus === ReportStatus::Selesai && blank($resolutionPhotoPath)) {
+            throw ValidationException::withMessages([
+                'resolution_photo' => 'Foto bukti penyelesaian wajib diunggah untuk menutup laporan.',
+            ]);
+        }
+
         $report->officer_id = $officer->id;
         $report->status = $nextStatus;
         $report->officer_note = filled($note) ? trim((string) $note) : null;
+
+        if ($nextStatus === ReportStatus::Selesai) {
+            $report->resolution_photo_path = $resolutionPhotoPath;
+        }
 
         match ($nextStatus) {
             ReportStatus::Diverifikasi => $report->verified_at = now(),

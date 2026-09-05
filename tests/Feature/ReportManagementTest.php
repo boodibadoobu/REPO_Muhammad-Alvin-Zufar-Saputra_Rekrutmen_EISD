@@ -26,19 +26,25 @@ class ReportManagementTest extends TestCase
         $warga = User::factory()->warga()->create();
         $categories = Category::factory()->count(2)->create();
 
-        $response = $this->actingAs($warga)->post(route('reports.store'), [
+        $response = $this->actingAs($warga)->withSession(['report_captcha_answer' => 12])->post(route('reports.store'), [
             'title' => 'Jalan lingkungan rusak berat',
             'description' => 'Permukaan jalan berlubang dan membahayakan pengguna jalan pada malam hari.',
             'address' => 'Jalan Melati RT 03 RW 02, Kelurahan Sukamaju',
+            'latitude' => -7.9668200,
+            'longitude' => 112.6329100,
             'photo' => $this->fakePng(),
             'category_ids' => $categories->modelKeys(),
+            'captcha_answer' => 12,
         ]);
 
+        $response->assertSessionHasNoErrors();
         $report = Report::query()->firstOrFail();
 
         $response->assertRedirect(route('reports.show', $report));
         $response->assertSessionHas('success');
         $this->assertSame(ReportStatus::Diajukan, $report->status);
+        $this->assertSame('-7.9668200', $report->latitude);
+        $this->assertSame('112.6329100', $report->longitude);
         $this->assertTrue($report->reporter->is($warga));
         $this->assertCount(2, $report->categories);
         Storage::disk('public')->assertExists($report->photo_path);
@@ -54,8 +60,11 @@ class ReportManagementTest extends TestCase
                 'title',
                 'description',
                 'address',
+                'latitude',
+                'longitude',
                 'photo',
                 'category_ids',
+                'captcha_answer',
             ]);
     }
 
@@ -82,6 +91,8 @@ class ReportManagementTest extends TestCase
                 'title' => 'Judul laporan diperbarui',
                 'description' => 'Deskripsi laporan yang sudah diperbarui dan tetap cukup panjang.',
                 'address' => 'Jalan Mawar RT 05 RW 03, Kelurahan Sukamaju',
+                'latitude' => -7.9712300,
+                'longitude' => 112.6298700,
                 'category_ids' => [$category->id],
             ])->assertRedirect(route('reports.show', $submitted));
 
@@ -102,6 +113,79 @@ class ReportManagementTest extends TestCase
         $this->actingAs($petugas)
             ->get(route('reports.create'))
             ->assertForbidden();
+    }
+
+    public function test_wrong_captcha_answer_is_rejected(): void
+    {
+        Storage::fake('public');
+        $warga = User::factory()->warga()->create();
+        $category = Category::factory()->create();
+
+        $this->actingAs($warga)
+            ->withSession(['report_captcha_answer' => 12])
+            ->post(route('reports.store'), [
+                'title' => 'Drainase lingkungan tersumbat',
+                'description' => 'Saluran air tersumbat dan menyebabkan genangan setelah hujan turun.',
+                'address' => 'Jalan Melati RT 03 RW 02, Kelurahan Sukamaju',
+                'latitude' => -7.9668200,
+                'longitude' => 112.6329100,
+                'photo' => $this->fakePng(),
+                'category_ids' => [$category->id],
+                'captcha_answer' => 10,
+            ])
+            ->assertSessionHasErrors('captcha_answer');
+
+        $this->assertDatabaseCount('reports', 0);
+    }
+
+    public function test_nearby_active_duplicate_requires_explicit_confirmation(): void
+    {
+        Storage::fake('public');
+        $warga = User::factory()->warga()->create();
+        $category = Category::factory()->create();
+        $existing = Report::factory()->for($warga, 'reporter')->create([
+            'latitude' => -7.9668200,
+            'longitude' => 112.6329100,
+        ]);
+        $existing->categories()->attach($category);
+
+        $payload = [
+            'title' => 'Kerusakan lain pada jalan yang sama',
+            'description' => 'Terdapat kerusakan berbeda beberapa meter dari laporan yang sebelumnya.',
+            'address' => 'Jalan Melati RT 03 RW 02, Kelurahan Sukamaju',
+            'latitude' => -7.9669000,
+            'longitude' => 112.6329500,
+            'category_ids' => [$category->id],
+            'captcha_answer' => 12,
+        ];
+
+        $this->actingAs($warga)
+            ->withSession(['report_captcha_answer' => 12])
+            ->post(route('reports.store'), [...$payload, 'photo' => $this->fakePng()])
+            ->assertSessionHasErrors('duplicate_confirmation');
+
+        $this->assertDatabaseCount('reports', 1);
+
+        $this->actingAs($warga)
+            ->withSession(['report_captcha_answer' => 12])
+            ->post(route('reports.store'), [
+                ...$payload,
+                'photo' => $this->fakePng(),
+                'duplicate_confirmation' => '1',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('reports', 2);
+    }
+
+    public function test_report_submission_is_limited_to_five_attempts_per_minute(): void
+    {
+        $this->actingAs(User::factory()->warga()->create());
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->postJson(route('reports.store'), [])->assertUnprocessable();
+        }
+        $this->postJson(route('reports.store'), [])->assertTooManyRequests()->assertHeader('Retry-After');
+        $this->assertDatabaseCount('reports', 0);
     }
 
     private function fakePng(): UploadedFile

@@ -86,7 +86,8 @@ Moving from `diproses` to `selesai` requires an uploaded resolution photo.
 Core tables:
 
 - `users`: id, name, email, password, role, timestamps.
-- `reports`: id, reporter `user_id`, nullable `officer_id`, title, description,
+- `reports`: id, nullable unique `demo_key` for repeatable demo seeding,
+  reporter `user_id`, nullable `officer_id`, title, description,
   address, nullable latitude/longitude for legacy compatibility, report photo
   path, nullable resolution photo path, status, officer note,
   verified/processed/resolved/rejected timestamps, timestamps.

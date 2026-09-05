@@ -106,7 +106,22 @@ Semua akun hasil seeder menggunakan kata sandi `Password123!`.
 |---|---|
 | Admin | `admin@laporkita.test` |
 | Petugas | `petugas@laporkita.test` |
-| Warga | `warga@laporkita.test` |
+| Warga 1 | `warga@laporkita.test` |
+| Warga 2 | `warga2@laporkita.test` |
+| Warga 3 | `warga3@laporkita.test` |
+
+Seeder membuat 5 akun, 6 kategori, dan 9 laporan: masing-masing 3 diverifikasi,
+ditolak, dan selesai. Setiap warga memiliki satu laporan untuk setiap status.
+Foto laporan dan bukti penyelesaian adalah ilustrasi demo pada disk public
+aplikasi, bukan file yang disimpan di PostgreSQL Supabase.
+
+Jalankan ulang dengan `php artisan db:seed --force`. Seeder hanya menambahkan
+entri yang belum ada; akun dicocokkan berdasarkan email, kategori berdasarkan
+slug, dan laporan berdasarkan `demo_key` unik yang tidak berubah saat laporan
+diedit. Password, status, kategori laporan, dan perubahan data yang sudah ada
+tidak ditimpa. Jika role akun dengan email demo bertabrakan, transaksi dibatalkan.
+Database yang sudah berisi data dapat memiliki jumlah total lebih besar.
+Hasil eksekusi dan verifikasi Supabase tersedia di [docs/SUPABASE_SEED.md](docs/SUPABASE_SEED.md).
 
 Ganti atau hapus akun demo sebelum deployment publik.
 

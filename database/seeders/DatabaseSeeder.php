@@ -3,115 +3,97 @@
 namespace Database\Seeders;
 
 use App\Enums\ReportStatus;
+use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        User::factory()->admin()->create([
-            'name' => 'Admin LaporKita',
-            'email' => 'admin@laporkita.test',
-            'password' => 'Password123!',
-        ]);
-        $officer = User::factory()->petugas()->create([
-            'name' => 'Petugas Lapangan',
-            'email' => 'petugas@laporkita.test',
-            'password' => 'Password123!',
-        ]);
-        $resident = User::factory()->warga()->create([
-            'name' => 'Warga Demo',
-            'email' => 'warga@laporkita.test',
-            'password' => 'Password123!',
-        ]);
+        $disk = Storage::disk('public');
+        foreach (['demo/laporan.svg', 'demo/penyelesaian.svg'] as $path) {
+            if (! $disk->exists($path) && ! $disk->put($path, file_get_contents(public_path('images/report-placeholder.svg')))) {
+                throw new RuntimeException('Gagal menyimpan ilustrasi laporan demo.');
+            }
+        }
 
-        $categories = collect([
-            ['name' => 'Jalan Rusak', 'slug' => 'jalan-rusak', 'description' => 'Jalan berlubang, retak, atau membahayakan pengguna.'],
-            ['name' => 'Drainase', 'slug' => 'drainase', 'description' => 'Saluran air tersumbat, rusak, atau memicu genangan.'],
-            ['name' => 'Sanitasi', 'slug' => 'sanitasi', 'description' => 'Masalah air bersih, limbah, dan fasilitas sanitasi.'],
-            ['name' => 'Sampah', 'slug' => 'sampah', 'description' => 'Penumpukan sampah dan sarana pengelolaan yang tidak memadai.'],
-            ['name' => 'Penerangan', 'slug' => 'penerangan', 'description' => 'Lampu jalan mati atau area publik minim penerangan.'],
-            ['name' => 'Bangunan Tidak Layak', 'slug' => 'bangunan-tidak-layak', 'description' => 'Hunian atau fasilitas umum yang tidak aman dan tidak layak.'],
-        ])->map(fn (array $category): Category => Category::query()->create($category));
+        DB::transaction(function (): void {
+            $accounts = [
+                ['admin@laporkita.test', 'Admin LaporKita', UserRole::Admin],
+                ['petugas@laporkita.test', 'Petugas Lapangan', UserRole::Petugas],
+                ['warga@laporkita.test', 'Warga Demo Satu', UserRole::Warga],
+                ['warga2@laporkita.test', 'Warga Demo Dua', UserRole::Warga],
+                ['warga3@laporkita.test', 'Warga Demo Tiga', UserRole::Warga],
+            ];
+            $users = collect($accounts)->mapWithKeys(function (array $account): array {
+                [$email, $name, $role] = $account;
+                $user = User::firstOrCreate(['email' => $email], [
+                    'name' => $name, 'password' => 'Password123!', 'role' => $role,
+                ]);
+                if ($user->role !== $role) {
+                    throw new RuntimeException('Role akun demo bertabrakan: '.$email);
+                }
 
-        Storage::disk('public')->put(
-            'reports/contoh-lingkungan.svg',
-            file_get_contents(public_path('images/report-placeholder.svg')),
-        );
+                return [$email => $user];
+            });
 
-        collect([
-            [
-                'title' => 'Jalan lingkungan berlubang dan tergenang',
-                'description' => 'Kerusakan jalan semakin lebar ketika hujan dan genangan membuat pengendara sulit melihat lubang.',
-                'address' => 'Jalan Melati RT 03 RW 02, Kelurahan Sukamaju',
-                'latitude' => -7.9668200,
-                'longitude' => 112.6329100,
-                'status' => ReportStatus::Diajukan,
-                'category_indexes' => [0, 1],
-            ],
-            [
-                'title' => 'Saluran drainase tertutup sampah',
-                'description' => 'Sampah menumpuk di saluran utama sehingga air meluap ke halaman rumah warga saat hujan deras.',
-                'address' => 'Gang Anggrek RT 05 RW 01, Kelurahan Sukamaju',
-                'latitude' => -7.9681400,
-                'longitude' => 112.6341800,
-                'status' => ReportStatus::Diverifikasi,
-                'category_indexes' => [1, 3],
-            ],
-            [
-                'title' => 'Lampu jalan padam di akses permukiman',
-                'description' => 'Tiga titik lampu jalan tidak menyala dan membuat akses menuju permukiman gelap pada malam hari.',
-                'address' => 'Jalan Kenanga RT 02 RW 06, Kelurahan Harapan',
-                'latitude' => -7.9724200,
-                'longitude' => 112.6297500,
-                'status' => ReportStatus::Diproses,
-                'category_indexes' => [4],
-            ],
-            [
-                'title' => 'Tempat sampah komunal sudah diperbaiki',
-                'description' => 'Tempat penampungan sementara sebelumnya rusak dan sampah tercecer ke badan jalan.',
-                'address' => 'Pasar Warga RW 04, Kelurahan Harapan',
-                'latitude' => -7.9740800,
-                'longitude' => 112.6360200,
-                'status' => ReportStatus::Selesai,
-                'category_indexes' => [3],
-            ],
-        ])->map(function (array $data) use ($resident, $officer, $categories): Report {
-            $categoryIndexes = $data['category_indexes'];
-            unset($data['category_indexes']);
+            $categories = collect([
+                ['jalan-rusak', 'Jalan Rusak', 'Jalan berlubang, retak, atau membahayakan pengguna.'],
+                ['drainase', 'Drainase', 'Saluran air tersumbat, rusak, atau memicu genangan.'],
+                ['sanitasi', 'Sanitasi', 'Masalah air bersih, limbah, dan fasilitas sanitasi.'],
+                ['sampah', 'Sampah', 'Penumpukan sampah dan sarana pengelolaan yang tidak memadai.'],
+                ['penerangan', 'Penerangan', 'Lampu jalan mati atau area publik minim penerangan.'],
+                ['bangunan-tidak-layak', 'Bangunan Tidak Layak', 'Hunian atau fasilitas umum yang tidak aman dan tidak layak.'],
+            ])->mapWithKeys(fn (array $data): array => [$data[0] => Category::firstOrCreate(
+                ['slug' => $data[0]], ['name' => $data[1], 'description' => $data[2]],
+            )]);
 
-            $report = new Report;
-            $report->user_id = $resident->id;
-            $report->officer_id = $data['status'] === ReportStatus::Diajukan ? null : $officer->id;
-            $report->title = $data['title'];
-            $report->description = $data['description'];
-            $report->address = $data['address'];
-            $report->latitude = $data['latitude'];
-            $report->longitude = $data['longitude'];
-            $report->photo_path = 'reports/contoh-lingkungan.svg';
-            $report->resolution_photo_path = $data['status'] === ReportStatus::Selesai
-                ? 'reports/contoh-lingkungan.svg'
-                : null;
-            $report->status = $data['status'];
-            $report->officer_note = $data['status'] === ReportStatus::Diajukan ? null : 'Laporan telah diperiksa oleh petugas lapangan.';
-            $report->verified_at = in_array($data['status'], [ReportStatus::Diverifikasi, ReportStatus::Diproses, ReportStatus::Selesai], true) ? now()->subDays(3) : null;
-            $report->processed_at = in_array($data['status'], [ReportStatus::Diproses, ReportStatus::Selesai], true) ? now()->subDays(2) : null;
-            $report->resolved_at = $data['status'] === ReportStatus::Selesai ? now()->subDay() : null;
-            $report->save();
-            $report->categories()->attach($categories->only($categoryIndexes)->pluck('id'));
-
-            return $report;
+            $examples = [
+                ['Saluran drainase tertutup sampah', ['drainase', 'sampah'], 'Gang Anggrek RT 05 RW 01'],
+                ['Jalan lingkungan berlubang', ['jalan-rusak', 'drainase'], 'Jalan Melati RT 03 RW 02'],
+                ['Lampu jalan padam', ['penerangan'], 'Jalan Kenanga RT 02 RW 06'],
+            ];
+            $residents = ['warga@laporkita.test', 'warga2@laporkita.test', 'warga3@laporkita.test'];
+            foreach ([ReportStatus::Diverifikasi, ReportStatus::Ditolak, ReportStatus::Selesai] as $statusIndex => $status) {
+                foreach ($examples as $index => [$title, $slugs, $address]) {
+                    $created = now()->subDays(7 + $index);
+                    $completed = $status === ReportStatus::Selesai;
+                    $rejected = $status === ReportStatus::Ditolak;
+                    $report = Report::firstOrCreate(['demo_key' => 'laporkita-v1-'.$status->value.'-'.($index + 1)], [
+                        'user_id' => $users[$residents[$index]]->id,
+                        'officer_id' => $users['petugas@laporkita.test']->id,
+                        'title' => '[Demo] '.$title.' — '.$status->label(),
+                        'description' => 'Data demonstrasi LaporKita, bukan kejadian nyata. '.$title.'. Kondisi lingkungan ini digunakan untuk memperagakan pelaporan dan tindak lanjut petugas. Foto yang ditampilkan adalah ilustrasi demo.',
+                        'address' => $address.', Kelurahan Demo, Malang',
+                        'latitude' => -7.96682 - ($statusIndex * 3 + $index) * 0.0012,
+                        'longitude' => 112.63291 + $index * 0.0013,
+                        'photo_path' => 'demo/laporan.svg',
+                        'resolution_photo_path' => $completed ? 'demo/penyelesaian.svg' : null,
+                        'status' => $status,
+                        'officer_note' => $rejected
+                            ? 'Demo penolakan: titik yang dilaporkan berada di area privat dan bukan kewenangan pengelola infrastruktur publik.'
+                            : ($completed ? 'Demo penyelesaian: perbaikan telah dituntaskan dan diperiksa. Bukti terlampir merupakan ilustrasi.' : 'Demo verifikasi: kategori, lokasi, dan kondisi telah diperiksa petugas.'),
+                        'created_at' => $created,
+                        'updated_at' => $created->copy()->addDays($completed ? 4 : 1),
+                        'verified_at' => $rejected ? null : $created->copy()->addDay(),
+                        'processed_at' => $completed ? $created->copy()->addDays(2) : null,
+                        'resolved_at' => $completed ? $created->copy()->addDays(4) : null,
+                        'rejected_at' => $rejected ? $created->copy()->addDay() : null,
+                    ]);
+                    if ($report->wasRecentlyCreated) {
+                        $report->categories()->attach(collect($slugs)->map(fn (string $slug): int => $categories[$slug]->id));
+                    }
+                }
+            }
         });
-
     }
 }

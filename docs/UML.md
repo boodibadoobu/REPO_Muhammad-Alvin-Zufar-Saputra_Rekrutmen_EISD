@@ -83,6 +83,7 @@ classDiagram
         +bigint id
         +bigint user_id
         +bigint? officer_id
+        +varchar? demo_key
         +varchar title
         +text description
         +varchar address
@@ -181,7 +182,7 @@ classDiagram
 | Tabel | Kolom migration | Constraint/index |
 |---|---|---|
 | `users` | `id`, `name`, `email`, `email_verified_at`, `password`, `role`, `remember_token`, `created_at`, `updated_at` | PK `id`, unique `email`, index `role` |
-| `reports` | `id`, `user_id`, `officer_id`, `title`, `description`, `address`, `latitude`, `longitude`, `photo_path`, `resolution_photo_path`, `status`, `officer_note`, empat timestamp proses, Laravel timestamps | FK reporter cascade, FK officer null-on-delete, index status, pasangan user/status, officer/status, dan latitude/longitude |
+| `reports` | `id`, `user_id`, `officer_id`, `title`, `description`, `address`, `latitude`, `longitude`, `photo_path`, `resolution_photo_path`, `demo_key`, `status`, `officer_note`, empat timestamp proses, Laravel timestamps | unique nullable demo_key (identitas seed), FK reporter cascade, FK officer null-on-delete, index status, pasangan user/status, officer/status, dan latitude/longitude |
 | `categories` | `id`, `name`, `slug`, `description`, Laravel timestamps | PK `id`, unique `name`, unique `slug` |
 | `category_report` | `id`, `category_id`, `report_id`, Laravel timestamps | Dua FK cascade dan unique pasangan kategori/laporan |
 

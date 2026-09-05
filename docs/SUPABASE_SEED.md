@@ -27,10 +27,14 @@ serta laporan tambahan tetap dipertahankan.
 
 ## Konfigurasi dan berkas
 
-Koneksi Supabase digunakan khusus untuk migration, seeding, dan verifikasi ini.
-Konfigurasi default aplikasi lokal masih SQLite; .env tidak diganti. Untuk melihat
-akun/data Supabase pada website lokal, gunakan pengaturan PostgreSQL pada README
-lalu jalankan php artisan config:clear. Data SQLite lama tetap tersimpan.
+Website lokal kini menggunakan PostgreSQL Supabase sebagai koneksi utama melalui
+Session pooler, dengan SSL diwajibkan. Konfigurasi disimpan pada .env yang diabaikan
+Git. Data SQLite lama tetap tersimpan. PHPUnit memaksa koneksi SQLite in-memory
+untuk test, terpisah dari database utama.
+
+Verifikasi browser: halaman publik menampilkan enam laporan (tiga diverifikasi
+dan tiga selesai). Login warga2@laporkita.test berhasil dan daftar laporan
+menampilkan tepat tiga laporan miliknya, termasuk laporan ditolak.
 
 Ilustrasi tersimpan pada disk public Laravel sebagai demo/laporan.svg dan
 demo/penyelesaian.svg. File tidak disimpan pada PostgreSQL. Server aplikasi lain

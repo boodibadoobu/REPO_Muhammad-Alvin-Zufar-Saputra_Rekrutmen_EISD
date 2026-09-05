@@ -56,7 +56,7 @@
 
     <label class="field">
         <span>{{ isset($report) ? 'Ganti foto bukti (opsional)' : 'Foto bukti' }}</span>
-        <span class="upload-box"><b>↑</b><span><strong>Pilih foto dari perangkat</strong><small>JPG, PNG, atau WebP · maksimal 2 MB</small></span><input type="file" name="photo" accept="image/jpeg,image/png,image/webp" @required(!isset($report))></span>
+        <span class="upload-box"><b>↑</b><span><strong>Pilih foto dari perangkat</strong><small>JPG, PNG, atau WebP · maksimal 2 MB · 8 megapiksel</small></span><input type="file" name="photo" accept="image/jpeg,image/png,image/webp" @required(!isset($report))></span>
         @isset($report)<small>Biarkan kosong untuk mempertahankan foto saat ini.</small>@endisset
         @error('photo')<small class="field-error">{{ $message }}</small>@enderror
     </label>

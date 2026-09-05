@@ -122,15 +122,15 @@ classDiagram
     class ReportController {
         +index(request) View
         +create(request) View
-        +store(request) RedirectResponse
+        +store(request, photos) RedirectResponse
         +show(report) View
         +edit(report) View
-        +update(request, report) RedirectResponse
+        +update(request, report, photos) RedirectResponse
         +destroy(report) RedirectResponse
     }
 
     class ReportStatusController {
-        +update(request, report, action) RedirectResponse
+        +update(request, report, transition, photos) RedirectResponse
     }
 
     class PublicReportController {
@@ -152,6 +152,13 @@ classDiagram
         +edit(user) View
         +update(request, user) RedirectResponse
     }
+
+    class StoreSanitizedPhoto {
+        +handle(photo, directory, field) string
+    }
+
+    ReportController ..> StoreSanitizedPhoto : sanitizes uploads
+    ReportStatusController ..> StoreSanitizedPhoto : sanitizes evidence
 
     class TransitionReportStatus {
         +handle(report, nextStatus, officer, note, resolutionPhotoPath) Report
@@ -206,8 +213,11 @@ flowchart TD
     H -- Ya --> I{Warga mengonfirmasi\nbukan duplikat?}
     I -- Tidak --> J[Tampilkan peringatan dan ID kandidat]
     J --> B
-    I -- Ya --> K[Simpan laporan berstatus diajukan]
-    H -- Tidak --> K
+    I -- Ya --> IMG[Betulkan orientasi dan hapus metadata foto]
+    IMG --> OK{Pemrosesan foto berhasil?}
+    OK -- Tidak --> G
+    OK -- Ya --> K[Simpan laporan berstatus diajukan]
+    H -- Tidak --> IMG
     K --> L[Simpan relasi kategori pada pivot]
     L --> M[Tampilkan flash message berhasil]
     M --> N[Petugas membuka detail laporan]
@@ -221,7 +231,7 @@ flowchart TD
     T --> U{Penanganan selesai?}
     U -- Belum --> S
     U -- Ya --> V[Unggah foto bukti penyelesaian]
-    V --> W{Foto valid?}
+    V --> W{Foto valid dan metadata berhasil dibersihkan?}
     W -- Tidak --> X[Tampilkan pesan kesalahan]
     X --> V
     W -- Ya --> Y[Status selesai dan tiket ditutup]
@@ -244,6 +254,7 @@ sequenceDiagram
     participant RC as ReportController
     participant FR as StoreReportRequest
     participant DD as FindPotentialDuplicateReports
+    participant IM as StoreSanitizedPhoto
     participant FS as Public Storage
     participant RM as Report Model
     participant DB as Supabase PostgreSQL
@@ -266,7 +277,8 @@ sequenceDiagram
             DD-->>W: redirect + ID kandidat + minta konfirmasi
         else tidak ada atau sudah dikonfirmasi
         FR->>RC: validated request
-        RC->>FS: simpan foto bukti
+        RC->>IM: betulkan orientasi dan encode tanpa metadata
+        IM->>FS: simpan hanya foto bersih
         RC->>RM: buat laporan via relasi user
         RM->>DB: INSERT reports + koordinat (status=diajukan)
         RC->>DB: INSERT category_report (satu atau lebih)
@@ -279,7 +291,8 @@ sequenceDiagram
     R->>SR: autentikasi, policy, validasi status dan file
     SR->>SC: validated status, catatan, dan file
     opt target status selesai
-        SC->>FS: simpan foto bukti penyelesaian
+        SC->>IM: betulkan orientasi dan encode tanpa metadata
+        IM->>FS: simpan hanya bukti bersih
     end
     SC->>TS: handle(report, status, petugas, catatan, path bukti)
     TS->>TS: periksa allowedTransitions()
@@ -310,3 +323,8 @@ stateDiagram-v2
     Selesai --> [*]
     Ditolak --> [*]
 ```
+
+Pemrosesan foto yang gagal mengembalikan validation error sebelum transaksi
+laporan/status. Foto original tidak disimpan permanen. Penggantian foto memakai
+action yang sama; file lama dihapus hanya setelah pembaruan database berhasil.
+Tidak ada perubahan schema untuk pembersihan metadata.

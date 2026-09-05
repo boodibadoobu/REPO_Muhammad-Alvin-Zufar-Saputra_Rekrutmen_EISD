@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\StoreSanitizedPhoto;
 use App\Enums\ReportStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\StoreReportRequest;
@@ -64,9 +65,9 @@ class ReportController extends Controller
         ]);
     }
 
-    public function store(StoreReportRequest $request): RedirectResponse
+    public function store(StoreReportRequest $request, StoreSanitizedPhoto $photos): RedirectResponse
     {
-        $photoPath = $request->file('photo')->store('reports', 'public');
+        $photoPath = $photos->handle($request->file('photo'), 'reports');
 
         try {
             $report = DB::transaction(function () use ($request, $photoPath): Report {
@@ -108,11 +109,11 @@ class ReportController extends Controller
         ]);
     }
 
-    public function update(UpdateReportRequest $request, Report $report): RedirectResponse
+    public function update(UpdateReportRequest $request, Report $report, StoreSanitizedPhoto $photos): RedirectResponse
     {
         $oldPhotoPath = $report->photo_path;
         $newPhotoPath = $request->hasFile('photo')
-            ? $request->file('photo')->store('reports', 'public')
+            ? $photos->handle($request->file('photo'), 'reports')
             : null;
 
         try {

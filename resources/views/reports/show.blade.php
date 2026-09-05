@@ -46,7 +46,7 @@
                                     <label class="field"><span>Status berikutnya</span><select name="status" required>@foreach($nextStatuses as $status)<option value="{{ $status->value }}">{{ $status->label() }}</option>@endforeach</select></label>
                                     <label class="field"><span>Catatan petugas</span><textarea name="officer_note" rows="4" maxlength="1000" placeholder="Wajib diisi jika laporan ditolak">{{ old('officer_note', $report->officer_note) }}</textarea></label>
                                     @if(collect($nextStatuses)->contains(\App\Enums\ReportStatus::Selesai))
-                                        <label class="field"><span>Foto bukti penyelesaian</span><span class="upload-box"><b>✓</b><span><strong>Unggah hasil penanganan</strong><small>Wajib untuk menutup tiket · maksimal 2 MB</small></span><input type="file" name="resolution_photo" accept="image/jpeg,image/png,image/webp" required></span></label>
+                                        <label class="field"><span>Foto bukti penyelesaian</span><span class="upload-box"><b>✓</b><span><strong>Unggah hasil penanganan</strong><small>Wajib untuk menutup tiket · maksimal 2 MB · 8 megapiksel</small></span><input type="file" name="resolution_photo" accept="image/jpeg,image/png,image/webp" required></span></label>
                                     @endif
                                     <button type="submit" class="button button-primary button-block">Perbarui status</button>
                                 </form>

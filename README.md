@@ -181,3 +181,28 @@ tersimpan di [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).
 - File unggahan saat ini menggunakan disk `public`. Untuk deployment serverless
   atau multi-instance, pindahkan disk ke object storage yang kompatibel S3 tanpa
   mengubah kontrak controller.
+
+## Privasi foto unggahan
+
+Semua foto baru, penggantian foto, dan bukti penyelesaian diproses oleh
+`StoreSanitizedPhoto` menggunakan Intervention Image 3 dan driver GD sebelum
+disimpan. Aktifkan ekstensi PHP `gd` dan `exif` sebelum `composer install`;
+GD harus mendukung JPEG, PNG, dan WebP. Restart server PHP setelah mengaktifkannya.
+
+Orientasi JPEG dibetulkan berdasarkan EXIF, kemudian gambar di-encode ulang tanpa
+metadata asli (termasuk EXIF GPS, perangkat, komentar, dan XMP). Format dipertahankan;
+JPEG/WebP dapat mengalami perubahan kualitas akibat encoding ulang. Animasi tidak
+dipertahankan. Upload dibatasi 2 MB dan 8 megapiksel untuk membatasi memori decode.
+Foto rusak atau gagal diproses ditolak, tanpa menyimpan original sebagai fallback.
+Foto demo dari seeder tidak diproses ulang. Koordinat pilihan pada peta dan isi
+visual foto tidak dihapus oleh pembersihan metadata.
+
+### Batas deployment Vercel
+
+PHP di Vercel memakai runtime komunitas `vercel-php`. Daftar ekstensi bawaannya
+tidak mencantumkan GD/Imagick; deployment memerlukan runtime dengan GD, EXIF, dan
+dukungan JPEG/PNG/WebP. Jangan mengabaikan persyaratan ekstensi Composer.
+Kompatibilitas deployment Vercel belum diuji. Penyimpanan foto juga harus memakai
+object storage permanen sebelum deployment serverless; disk public lokal saat ini
+belum memenuhi kebutuhan tersebut. Referensi: [Vercel runtimes](https://vercel.com/docs/functions/runtimes)
+dan [PHP runtime](https://github.com/vercel-community/php).

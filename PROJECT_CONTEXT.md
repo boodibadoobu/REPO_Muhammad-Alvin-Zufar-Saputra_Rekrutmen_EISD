@@ -130,3 +130,13 @@ migrations match the diagrams, and the documentation is sufficient for an EISD
 reviewer to run and assess the application.
 Public completion evidence, reporter privacy, CAPTCHA, duplicate detection, and
 map behavior are part of these completion criteria.
+
+## Uploaded photo privacy
+
+New uploads (report creation, replacement, and completion evidence) must be
+decoded and re-encoded with Intervention Image using GD, with JPEG EXIF orientation
+applied before stripping metadata. PHP GD and EXIF are required. Only sanitized
+output is stored; decoding failures must reject the upload without a raw fallback.
+Limit input to 2 MB and 8 megapixels. Existing seeded demo images are excluded.
+Map coordinates remain part of the report. Vercel deployment is unverified and
+requires a compatible image-processing runtime and persistent object storage.

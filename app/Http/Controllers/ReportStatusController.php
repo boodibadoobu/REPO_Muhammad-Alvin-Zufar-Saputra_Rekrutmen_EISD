@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\StoreSanitizedPhoto;
 use App\Actions\TransitionReportStatus;
 use App\Enums\ReportStatus;
 use App\Http\Requests\UpdateReportStatusRequest;
@@ -16,10 +17,11 @@ class ReportStatusController extends Controller
         UpdateReportStatusRequest $request,
         Report $report,
         TransitionReportStatus $transition,
+        StoreSanitizedPhoto $photos,
     ): RedirectResponse {
         $nextStatus = ReportStatus::from($request->validated('status'));
         $resolutionPhotoPath = $nextStatus === ReportStatus::Selesai
-            ? $request->file('resolution_photo')?->store('report-resolutions', 'public')
+            ? $photos->handle($request->file('resolution_photo'), 'report-resolutions', 'resolution_photo')
             : null;
 
         try {

@@ -5,7 +5,7 @@
 @section('content')
     <section class="auth-section">
         <div class="auth-card">
-            <div class="auth-heading"><span class="eyebrow">Selamat datang kembali</span><h1>Masuk ke LaporKita</h1><p>Pantau laporanmu atau lanjutkan proses penanganan.</p></div>
+            <div class="auth-heading"><span class="eyebrow">Selamat datang kembali</span><h1>Masuk ke PleaseFix</h1><p>Pantau laporanmu atau lanjutkan proses penanganan.</p></div>
             <form method="POST" action="{{ route('login') }}" class="form-stack">
                 @csrf
                 <label class="field"><span>Email</span><input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com">@error('email')<small class="field-error">{{ $message }}</small>@enderror</label>

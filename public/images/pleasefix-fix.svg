@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50" role="img" aria-labelledby="title">
+  <title id="title">Fix</title>
+  <g fill="#167554">
+    <path d="M2 6h30v9H13v8h16v9H13v12H2V6Z"/>
+    <circle cx="41" cy="11" r="5.5"/>
+    <path d="M35.5 21h11v23h-11V21Z"/>
+    <g transform="rotate(-45 82 25)">
+      <rect x="76.5" y="8" width="11" height="37" rx="5.5"/>
+      <path d="M69 5h26v10H69a5 5 0 0 1 0-10Z"/>
+      <path d="M75 41h14v7H75z"/>
+    </g>
+    <g transform="rotate(45 82 25)">
+      <rect x="76.5" y="9" width="11" height="34" rx="5.5"/>
+      <path d="M75 5c0-3 2-5 5-5h4v8h4V0h4c3 0 5 2 5 5v6l-7 7h-8l-7-7V5Z"/>
+      <path d="M73 40h18v5H73z"/>
+    </g>
+  </g>
+</svg>

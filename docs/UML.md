@@ -1,4 +1,4 @@
-# Analisis dan Perancangan Sistem LaporKita
+# Analisis dan Perancangan Sistem PleaseFix
 
 Dokumen ini adalah sumber UML yang harus tetap sinkron dengan migration dan kode
 Laravel. Diagram menggunakan Mermaid dan dirender otomatis oleh GitHub.
@@ -19,7 +19,7 @@ flowchart LR
     P([Petugas])
     A([Admin])
 
-    subgraph S[Platform LaporKita]
+    subgraph S[Platform PleaseFix]
         UC1((Registrasi akun warga))
         UC2((Login dan logout))
         UC3((Melihat dashboard))

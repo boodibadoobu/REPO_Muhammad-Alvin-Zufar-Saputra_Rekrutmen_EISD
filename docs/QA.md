@@ -1,4 +1,4 @@
-# QA LaporKita
+# QA PleaseFix
 
 ## Verifikasi terbaru — 6 September 2026 (WIB)
 
@@ -125,7 +125,7 @@ Lighthouse snapshot pada detail publik mobile memberi skor 100 untuk
 Accessibility, Best Practices, SEO, dan Agentic Browsing. Terdapat satu temuan
 eksperimental label-content-name-mismatch pada logo: teks dekoratif “L”
 terbaca oleh audit sebagai bagian label, sementara markup memang menandainya
-aria-hidden dan nama tautan adalah “LaporKita beranda”. Skor otomatis ini tidak
+aria-hidden dan nama tautan adalah “PleaseFix beranda”. Skor otomatis ini tidak
 menggantikan pengujian pembaca layar atau audit aksesibilitas menyeluruh.
 
 ### Batas verifikasi

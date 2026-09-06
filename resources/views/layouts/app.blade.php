@@ -4,16 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Laporkan kondisi permukiman dan infrastruktur rusak yang mengganggu keselamatan serta akses warga. Pantau progres dan bukti penyelesaiannya di LaporKita.">
-    <title>@yield('title', 'LaporKita') · Kota Lebih Layak</title>
+    <meta name="description" content="Laporkan kondisi permukiman dan infrastruktur rusak yang mengganggu keselamatan serta akses warga. Pantau progres dan bukti penyelesaiannya di PleaseFix.">
+    <title>@yield('title', 'PleaseFix') · Kota Lebih Layak</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <header class="site-header">
         <div class="container nav-wrap">
-            <a href="{{ route('home') }}" class="brand" aria-label="LaporKita beranda">
-                <span class="brand-mark" aria-hidden="true">L</span>
-                <span>Lapor<span>Kita</span></span>
+            <a href="{{ route('home') }}" class="brand" aria-label="PleaseFix beranda">
+                <img src="{{ asset('images/pleasefix-mark.svg') }}" class="brand-mark" alt="" aria-hidden="true">
+                <x-brand-word />
             </a>
 
             <nav class="desktop-nav" aria-label="Navigasi utama">
@@ -105,9 +105,9 @@
     <footer class="site-footer">
         <div class="container footer-grid">
             <div>
-                <a href="{{ route('home') }}" class="brand brand-light">
-                    <span class="brand-mark" aria-hidden="true">L</span>
-                    <span>Lapor<span>Kita</span></span>
+                <a href="{{ route('home') }}" class="brand brand-light" aria-label="PleaseFix beranda">
+                    <img src="{{ asset('images/pleasefix-mark.svg') }}" class="brand-mark" alt="" aria-hidden="true">
+                    <x-brand-word />
                 </a>
                 <p>Suara warga untuk lingkungan yang aman, mudah diakses, dan layak huni.</p>
             </div>
@@ -116,7 +116,7 @@
                 <p>Kota dan permukiman yang inklusif, aman, tangguh, dan berkelanjutan.</p>
                 <a href="{{ route('public-reports.index') }}" class="footer-link">Lihat laporan publik →</a>
             </div>
-            <p class="copyright">© {{ date('Y') }} LaporKita · Rekrutmen Aslab EISD</p>
+            <p class="copyright">© {{ date('Y') }} PleaseFix · Rekrutmen Aslab EISD</p>
         </div>
     </footer>
 </body>

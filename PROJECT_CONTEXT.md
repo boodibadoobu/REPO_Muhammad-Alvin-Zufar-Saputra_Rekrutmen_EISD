@@ -3,7 +3,7 @@
 ## Identity
 
 - Repository name: `REPO_Muhammad Alvin Zufar Saputra_Rekrutmen_EISD`
-- Product name: **LaporKita** (working name; may be changed without changing scope)
+- Product name: **PleaseFix**
 - Theme: **Platform Pelaporan Permukiman Kumuh & Infrastruktur Rusak**
 - SDG alignment: SDG 11 — Sustainable Cities and Communities, especially safer,
   inclusive, resilient, and sustainable settlements.
@@ -159,5 +159,8 @@ decoded and re-encoded with Intervention Image using GD, with JPEG EXIF orientat
 applied before stripping metadata. PHP GD and EXIF are required. Only sanitized
 output is stored; decoding failures must reject the upload without a raw fallback.
 Limit input to 2 MB and 8 megapixels. Existing seeded demo images are excluded.
-Map coordinates remain part of the report. Vercel deployment is unverified and
-requires a compatible image-processing runtime and persistent object storage.
+Map coordinates remain part of the report. Vercel configuration uses PHP 8.5
+with build-time platform/GD checks, temporary Laravel cache storage, database
+sessions/cache, and an optional S3-backed public disk for Supabase Storage.
+Local storage remains the default. Remote Vercel deployment and bucket access
+must still be verified using docs/VERCEL.md before declaring production ready.

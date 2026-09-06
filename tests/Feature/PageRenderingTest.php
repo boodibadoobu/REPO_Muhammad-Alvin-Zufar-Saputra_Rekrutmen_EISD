@@ -20,8 +20,8 @@ class PageRenderingTest extends TestCase
 
     public function test_public_pages_render(): void
     {
-        $this->get(route('home'))->assertOk()->assertSee('LaporKita');
-        $this->get(route('login'))->assertOk()->assertSee('Masuk ke LaporKita');
+        $this->get(route('home'))->assertOk()->assertSee('PleaseFix');
+        $this->get(route('login'))->assertOk()->assertSee('Masuk ke PleaseFix');
         $this->get(route('register'))->assertOk()->assertSee('Buat akun warga');
         $this->get(route('public-reports.index'))->assertOk()->assertSee('Laporan Publik');
     }

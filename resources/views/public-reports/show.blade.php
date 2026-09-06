@@ -42,7 +42,7 @@
                         <dl>
                             <div><dt>ID laporan</dt><dd>#{{ str_pad($report->id, 5, '0', STR_PAD_LEFT) }}</dd></div>
                             <div><dt>Pelapor</dt><dd>Identitas dilindungi</dd></div>
-                            <div><dt>Penanganan</dt><dd>{{ $report->officer ? 'Petugas LaporKita' : 'Menunggu petugas' }}</dd></div>
+                            <div><dt>Penanganan</dt><dd>{{ $report->officer ? 'Petugas PleaseFix' : 'Menunggu petugas' }}</dd></div>
                             <div><dt>Status</dt><dd><span class="badge {{ $report->status->badgeClass() }}">{{ $report->status->label() }}</span></dd></div>
                             <div><dt>Diperbarui</dt><dd>{{ $report->updated_at->format('d M Y, H:i') }}</dd></div>
                         </dl>

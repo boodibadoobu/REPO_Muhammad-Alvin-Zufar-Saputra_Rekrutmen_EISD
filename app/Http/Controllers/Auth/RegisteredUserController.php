@@ -38,6 +38,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', 'Akun berhasil dibuat. Selamat datang di LaporKita!');
+        return redirect()->route('dashboard')->with('success', 'Akun berhasil dibuat. Selamat datang di PleaseFix!');
     }
 }

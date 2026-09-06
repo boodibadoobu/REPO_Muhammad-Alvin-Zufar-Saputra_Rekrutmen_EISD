@@ -1,11 +1,11 @@
-# LaporKita — Platform Pelaporan Permukiman & Infrastruktur
+# PleaseFix — Platform Pelaporan Permukiman & Infrastruktur
 
-LaporKita adalah aplikasi Laravel untuk membantu warga melaporkan permukiman
+PleaseFix adalah aplikasi Laravel untuk membantu warga melaporkan permukiman
 kumuh, jalan rusak, drainase, sanitasi, sampah, penerangan, dan infrastruktur
 publik lain yang membutuhkan penanganan. Proyek ini dibuat untuk Rekrutmen Aslab
 EISD dan mendukung **SDG 11: Sustainable Cities and Communities**.
 
-Fokus LaporKita adalah dampak kondisi tersebut terhadap keselamatan,
+Fokus PleaseFix adalah dampak kondisi tersebut terhadap keselamatan,
 aksesibilitas, dan kelayakan lingkungan. Contohnya, jalan berlubang membahayakan
 pengguna, genangan menghambat akses warga, atau penerangan rusak menyulitkan
 penggunaan fasilitas pada malam hari. Warga melaporkan kondisi dengan foto dan
@@ -241,10 +241,14 @@ visual foto tidak dihapus oleh pembersihan metadata.
 
 ### Batas deployment Vercel
 
-PHP di Vercel memakai runtime komunitas `vercel-php`. Daftar ekstensi bawaannya
-tidak mencantumkan GD/Imagick; deployment memerlukan runtime dengan GD, EXIF, dan
-dukungan JPEG/PNG/WebP. Jangan mengabaikan persyaratan ekstensi Composer.
-Kompatibilitas deployment Vercel belum diuji. Penyimpanan foto juga harus memakai
-object storage permanen sebelum deployment serverless; disk public lokal saat ini
-belum memenuhi kebutuhan tersebut. Referensi: [Vercel runtimes](https://vercel.com/docs/functions/runtimes)
+Konfigurasi Vercel kini tersedia di repository. Ikuti [panduan Vercel](docs/VERCEL.md)
+untuk pengaturan dashboard, runtime, dan Supabase Storage. Deployment remote
+belum diverifikasi; kelulusan test lokal bukan bukti deployment berhasil.
+
+PHP di Vercel memakai runtime komunitas `vercel-php@0.9.0`. Paket PHP 8.5
+`@libphp/almalinux-9-v85@0.0.3` menyertakan dan mengaktifkan GD serta EXIF.
+Build memeriksa dukungan JPEG/PNG/WebP dan persyaratan Composer secara eksplisit.
+Kompatibilitas deployment Vercel belum diuji. Aktifkan PUBLIC_DISK_DRIVER=s3
+dan isi konfigurasi Supabase Storage untuk foto permanen. Default lokal tetap
+menggunakan disk lokal. Referensi: [Vercel runtimes](https://vercel.com/docs/functions/runtimes)
 dan [PHP runtime](https://github.com/vercel-community/php).

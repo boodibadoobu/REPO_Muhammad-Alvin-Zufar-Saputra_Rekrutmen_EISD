@@ -1,27 +1,46 @@
-*.log
-.DS_Store
+# Local environment and credentials; keep the setup example versioned.
 .env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
+.env.*
+!.env.example
 /auth.json
+/storage/*.key
+
+# Installed dependencies and generated frontend output.
 /node_modules
+/vendor
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
-/storage/*.key
+
+# Test output, logs, and local caches.
+*.log
+.phpunit.result.cache
+/.phpunit.cache
+/coverage/
 /storage/pail
-/vendor
+__pycache__/
+*.pyc
+
+# Local editor, agent, VM, and deployment-tool settings.
+/.agents/
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.vscode
+/.zed
+/.vercel/
+.phpactor.json
 _ide_helper.php
 Homestead.json
 Homestead.yaml
+
+# Presentation scripts, diagram working files, and personal study documents.
+# Keep docs/*.md: README links to these website setup, UML, and QA references.
+/docs/requirements/
+/docs/panduan/
+
+# Operating system metadata.
+.DS_Store
 Thumbs.db

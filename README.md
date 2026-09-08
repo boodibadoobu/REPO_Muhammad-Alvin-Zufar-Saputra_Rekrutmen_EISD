@@ -1,4 +1,4 @@
-# PleaseFix — Platform Pelaporan Permukiman & Infrastruktur
+# PleaseFix - Platform Pelaporan Permukiman & Infrastruktur
 
 PleaseFix adalah aplikasi Laravel untuk membantu warga melaporkan permukiman
 kumuh, jalan rusak, drainase, sanitasi, sampah, penerangan, dan infrastruktur
@@ -18,8 +18,6 @@ evaluasi pemeliharaan yang relevan dengan partisipasi pada target 11.3. Jumlah
 laporan dan status selesai bukan pengukuran indikator resmi SDG atau bukti
 independen kualitas perbaikan. Referensi: [target SDG 11 PBB](https://sdgs.un.org/goals/goal11).
 
-Nama repository yang ditetapkan:
-`REPO_Muhammad Alvin Zufar Saputra_Rekrutmen_EISD`.
 
 ## Fitur utama
 
@@ -61,7 +59,6 @@ permukiman dan infrastruktur lingkungan.
 - Blade, Vite, Tailwind CSS 4, Leaflet 1.9, dan tile OpenStreetMap untuk tampilan
 - PHPUnit dengan SQLite in-memory untuk automated test
 
-Tidak ada package admin atau generator CRUD otomatis seperti Filament.
 
 ## Instalasi
 
@@ -96,9 +93,6 @@ DB_USERNAME=postgres.your-project-ref
 DB_PASSWORD=your-supabase-database-password
 DB_SSLMODE=require
 ```
-
-Jangan commit `.env` atau password Supabase ke repository. Autentikasi pengguna
-tetap dikelola Laravel; Supabase hanya bertindak sebagai PostgreSQL terkelola.
 
 Setelah koneksi siap:
 
@@ -166,9 +160,6 @@ php artisan view:cache
 git diff --check
 ```
 
-Hasil QA browser, batas verifikasi, dan checklist demo tersedia di
-[docs/QA.md](docs/QA.md).
-
 ## Skenario demonstrasi
 
 Gunakan kasus ilustratif jalan lingkungan berlubang yang mengganggu akses warga.
@@ -207,9 +198,6 @@ browser QA memeriksa tampilan, validasi, dan pengalaman ketiga jalur unggahan.
   dan dibuat dalam 30 hari terakhir. Warga dapat melanjutkan setelah memberi
   konfirmasi eksplisit agar kondisi yang memang berbeda tidak terblokir.
 
-Dokumentasi Use Case, Class, Activity, Sequence, state diagram, dan kecocokan
-database tersedia di [docs/UML.md](docs/UML.md). Keputusan scope permanen proyek
-tersimpan di [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).
 
 ## Catatan deployment
 
@@ -238,17 +226,3 @@ dipertahankan. Upload dibatasi 2 MB dan 8 megapiksel untuk membatasi memori deco
 Foto rusak atau gagal diproses ditolak, tanpa menyimpan original sebagai fallback.
 Foto demo dari seeder tidak diproses ulang. Koordinat pilihan pada peta dan isi
 visual foto tidak dihapus oleh pembersihan metadata.
-
-### Batas deployment Vercel
-
-Konfigurasi Vercel kini tersedia di repository. Ikuti [panduan Vercel](docs/VERCEL.md)
-untuk pengaturan dashboard, runtime, dan Supabase Storage. Deployment remote
-belum diverifikasi; kelulusan test lokal bukan bukti deployment berhasil.
-
-PHP di Vercel memakai runtime komunitas `vercel-php@0.9.0`. Paket PHP 8.5
-`@libphp/almalinux-9-v85@0.0.3` menyertakan dan mengaktifkan GD serta EXIF.
-Build memeriksa dukungan JPEG/PNG/WebP dan persyaratan Composer secara eksplisit.
-Kompatibilitas deployment Vercel belum diuji. Aktifkan PUBLIC_DISK_DRIVER=s3
-dan isi konfigurasi Supabase Storage untuk foto permanen. Default lokal tetap
-menggunakan disk lokal. Referensi: [Vercel runtimes](https://vercel.com/docs/functions/runtimes)
-dan [PHP runtime](https://github.com/vercel-community/php).
